@@ -5,7 +5,8 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import List exposing (map, range)
 import Component.Grid
-import Maybe
+import Platform.Cmd as Cmd
+import Platform.Sub as Sub
 
 type Message
   = Reset
@@ -18,22 +19,24 @@ type alias Model =
   , lastDrawn : Maybe Int
   }
 
-init : Model
-init =
+model : Model
+model =
   { avail  = range 1 20
   , picked = []
   , lastDrawn = Nothing
   }
 
-update : Message -> Model -> Model
+init = (model, Cmd.none)
+
+update : Message -> Model -> (Model, Cmd Message)
 update msg model =
   case msg of
     Reset ->
-      { model | picked = [], lastDrawn = Nothing }
+      ({ model | picked = [], lastDrawn = Nothing }, Cmd.none)
     GetNumber ->
       update (NewNumber 4) model
     NewNumber x ->
-      { model | picked = model.picked ++ [x], lastDrawn = Just 4 }
+      ({ model | picked = model.picked ++ [x], lastDrawn = Just 4 }, Cmd.none)
 
 view : Model -> Html Message
 view model =
@@ -52,8 +55,11 @@ view model =
       ]
     ]
 
-main = beginnerProgram
-  { model  = init
-  , view   = view
-  , update = update
+subscriptions model = Sub.none
+
+main = program
+  { init          = init
+  , update        = update
+  , subscriptions = subscriptions
+  , view          = view
   }
