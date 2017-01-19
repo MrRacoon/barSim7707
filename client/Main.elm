@@ -24,42 +24,57 @@ type Message
 type alias Model =
   { avail     : List Int
   , picked    : List Int
+  , pickCount : Int
   , lastDrawn : Maybe Int
-  , startTime : Time
+  , startTime : Maybe Time
   , curTime   : Time
   , state     : State
   }
 
-model : Model
-model =
-  { avail  = range 1 20
-  , picked = []
+modeli : Model
+modeli =
+  { avail     = range 1 80
+  , picked    = []
+  , pickCount = 20
   , lastDrawn = Nothing
-  , startTime = 0
-  , curTime = 0
-  , state   = DuringGame
+  , startTime = Nothing
+  , curTime   = 0
+  , state     = DuringGame
   }
 
-init = (model, Cmd.none)
+init = (modeli, Cmd.none)
 
 update : Message -> Model -> (Model, Cmd Message)
 update msg model =
-  let newNumber = generate NewNumber (int 1 20)
+  let lenAvail  = length model.avail
+      newNumber = generate NewNumber (int 1 lenAvail)
   in case msg of
+
     Reset ->
-      ({ model | picked = [], lastDrawn = Nothing }, Cmd.none)
+      ({ model
+      | picked = []
+      , lastDrawn = Nothing
+      , state = DuringGame
+      , startTime = Nothing
+      }, Cmd.none)
+
+    -- For manual requests
     GetNumber ->
-      if length model.avail == length model.picked
+      if length model.picked == model.pickCount
         then ({ model | picked = [], lastDrawn = Nothing }, Cmd.none)
         else (model, newNumber)
+
     NewNumber x ->
-      if length model.picked == length model.avail
-        then ({ model | state = PreGame }, Cmd.none)
+      if length model.picked == model.pickCount
+        then ({ model | state = PreGame, lastDrawn = Nothing, startTime = Nothing }, Cmd.none)
         else if member x model.picked
           then (model, newNumber)
-          else ({ model | picked = model.picked ++ [x], lastDrawn = Just x }, Cmd.none)
+          else ({ model | picked = x :: model.picked, lastDrawn = Just x }, Cmd.none)
+
     TimerTick t ->
-      ({ model | curTime = t }, newNumber)
+      case model.startTime of
+        Nothing -> ({ model | curTime = t, startTime = Just t }, newNumber)
+        Just _  -> ({ model | curTime = t }, newNumber)
 
 view : Model -> Html Message
 view model =
@@ -68,7 +83,8 @@ view model =
     [ Component.Grid.render model.avail model.picked model.lastDrawn
     , button [onClick GetNumber] [text "NewNum"]
     , button [onClick Reset] [text "Reset"]
-    , span [] [ text <| toString model.startTime ++ toString model.curTime]
+    , div [] [ text <| toString model.startTime ]
+    , div [] [ text <| toString model.curTime]
     , div []
       [ case model.lastDrawn of
         Nothing ->
