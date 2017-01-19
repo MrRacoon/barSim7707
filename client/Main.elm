@@ -11,6 +11,10 @@ import Time exposing (Time, second, every)
 
 import Component.Grid
 
+type State
+  = DuringGame
+  | PreGame
+
 type Message
   = Reset
   | GetNumber
@@ -23,6 +27,7 @@ type alias Model =
   , lastDrawn : Maybe Int
   , startTime : Time
   , curTime   : Time
+  , state     : State
   }
 
 model : Model
@@ -32,6 +37,7 @@ model =
   , lastDrawn = Nothing
   , startTime = 0
   , curTime = 0
+  , state   = DuringGame
   }
 
 init = (model, Cmd.none)
@@ -47,9 +53,11 @@ update msg model =
         then ({ model | picked = [], lastDrawn = Nothing }, Cmd.none)
         else (model, newNumber)
     NewNumber x ->
-      if member x model.picked
-        then (model, newNumber)
-        else ({ model | picked = model.picked ++ [x], lastDrawn = Just x }, Cmd.none)
+      if length model.picked == length model.avail
+        then ({ model | state = PreGame }, Cmd.none)
+        else if member x model.picked
+          then (model, newNumber)
+          else ({ model | picked = model.picked ++ [x], lastDrawn = Just x }, Cmd.none)
     TimerTick t ->
       ({ model | curTime = t }, newNumber)
 
@@ -71,11 +79,12 @@ view model =
     ]
 
 subscriptions model =
-  if length model.avail == length model.picked
-    then Sub.none
-    else Sub.batch
-      [ every second TimerTick
-      ]
+  case model.state of
+    PreGame -> Sub.none
+    DuringGame ->
+      Sub.batch
+        [ every second TimerTick
+        ]
 
 main = program
   { init          = init
