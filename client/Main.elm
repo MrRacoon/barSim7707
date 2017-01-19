@@ -1,22 +1,59 @@
 module Main exposing (..)
 
-import Debug exposing (log)
-import Html  exposing (beginnerProgram, Html, div, text)
-import List  exposing (map)
+-- import Debug exposing (log)
+import Html exposing (..)
+import Html.Events exposing (onClick)
+import List exposing (map, range)
 import Component.Grid
+import Maybe
 
-type Message = NewNumber Int
+type Message
+  = Reset
+  | GetNumber
+  | NewNumber Int
 
-model = [1,2,3]
+type alias Model =
+  { avail     : List Int
+  , picked    : List Int
+  , lastDrawn : Maybe Int
+  }
 
+init : Model
+init =
+  { avail  = range 1 20
+  , picked = []
+  , lastDrawn = Nothing
+  }
+
+update : Message -> Model -> Model
 update msg model =
   case msg of
-    NewNumber x -> model ++ [x]
+    Reset ->
+      { model | picked = [], lastDrawn = Nothing }
+    GetNumber ->
+      update (NewNumber 4) model
+    NewNumber x ->
+      { model | picked = model.picked ++ [x], lastDrawn = Just 4 }
 
-view model = div [] [Component.Grid.render model]
+view : Model -> Html Message
+view model =
+  div
+    []
+    [ Component.Grid.render model.avail model.picked model.lastDrawn
+    , button [onClick GetNumber] [text "NewNum"]
+    , button [onClick Reset] [text "Reset"]
+    , div
+      []
+      [ case model.lastDrawn of
+        Nothing ->
+          text (toString model.lastDrawn)
+        Just x ->
+          text (toString x)
+      ]
+    ]
 
 main = beginnerProgram
-  { model  = model
+  { model  = init
   , view   = view
   , update = update
   }
