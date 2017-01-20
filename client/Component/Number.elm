@@ -19,18 +19,21 @@ numberColor picked lastDrawn cur =
           else pickedColor
     else defaultColor
 
+styles picked lastDrawn cur = style
+  [ ("border", "2px outset grey")
+  , ("color", numberColor picked lastDrawn cur)
+  , ("margin", "5px")
+  , ("padding", "5px")
+  , ("height", "20px")
+  , ("width", "20px")
+  , ("text-align", "center")
+  ]
+
 render : List Int -> Maybe Int -> Int -> Html a
 render picked lastDrawn cur =
   let attrs =
     [ class "cell"
-    , style [ ("border", "2px outset grey")
-            , ("color", numberColor picked lastDrawn cur)
-            , ("margin", "5px")
-            , ("padding", "5px")
-            , ("height", "20px")
-            , ("width", "20px")
-            , ("text-align", "center")
-            ]
+    , styles picked lastDrawn cur
     ]
       children = [ text (toString cur) ]
   in span attrs children
