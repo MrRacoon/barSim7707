@@ -58,7 +58,7 @@ update msg model =
       , startTime = Nothing
       }, Cmd.none)
 
-    -- For manual requests
+    -- For manualg requests
     GetNumber ->
       if length model.picked == model.pickCount
         then ({ model | picked = [], lastDrawn = Nothing }, Cmd.none)
@@ -78,20 +78,10 @@ update msg model =
 
 view : Model -> Html Message
 view model =
-  div
-    []
+  div []
     [ Component.Grid.render model.avail model.picked model.lastDrawn
     , button [onClick GetNumber] [text "NewNum"]
     , button [onClick Reset] [text "Reset"]
-    , div [] [ text <| toString model.startTime ]
-    , div [] [ text <| toString model.curTime]
-    , div []
-      [ case model.lastDrawn of
-        Nothing ->
-          text (toString model.lastDrawn)
-        Just x ->
-          text (toString x)
-      ]
     ]
 
 subscriptions model =

@@ -4,6 +4,13 @@ import Html exposing (Html, span, text)
 import Html.Attributes exposing (style)
 import List exposing (member)
 
+border         = ("border", "5px solid red")
+
+cellAttrs =
+  [ style
+    [ border
+    ]
+  ]
 
 numberColor : List Int -> Maybe Int -> Int -> String
 numberColor picked lastDrawn cur =
@@ -22,10 +29,14 @@ numberColor picked lastDrawn cur =
 
 render : List Int -> Maybe Int -> Int -> Html a
 render picked lastDrawn cur =
-  span
-    [ style
-      [ ("color", numberColor picked lastDrawn cur)
-      , ("margin", "10px")
-      ]
+  let attrs =
+    [ style [ ("border", "5px outset purple")
+            , ("color", numberColor picked lastDrawn cur)
+            , ("margin", "5px")
+            , ("padding", "5px")
+            , ("height", "20px")
+            , ("width", "20px")
+            , ("text-align", "center")
+            ]
     ]
-    [ text (toString cur) ]
+  in span attrs [ text (toString cur) ]
