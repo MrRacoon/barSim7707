@@ -6,11 +6,12 @@ import List exposing (member)
 
 baseStyles =
   [ ("border", "3px outset grey")
-  , ("margin", "5px")
-  , ("padding", "5px")
+  , ("margin", "2px")
+  , ("padding", "20px")
   , ("height", "20px")
   , ("width", "20px")
   , ("text-align", "center")
+  , ("font-family", "arial")
   ]
 
 pickedStyles  = [("color", "#00FF00"), ("background-color", "green")]
