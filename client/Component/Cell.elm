@@ -17,25 +17,19 @@ pickedStyles  = [("color", "#00FF00"), ("background-color", "green")]
 lastStyles    = [("color", "#0000FF"), ("background-color", "lightblue")]
 defaultStyles = [("color", "#000000")]
 
-styles picked lastDrawn cur =
-  let cellStyles = cellStyle picked lastDrawn cur
-  in style <| baseStyles ++ cellStyles
+styles model cur = style <| baseStyles ++ cellStyle model cur
 
-render : List Int -> Maybe Int -> Int -> Html a
-render picked lastDrawn cur =
-  let attrs =
-    [ class "cell"
-    , styles picked lastDrawn cur
-    ]
-      children = [ text (toString cur) ]
-  in span attrs children
+-- render : List Int -> Maybe Int -> Int -> Html a
+render model cur = span
+  [ class "cell" , styles model cur ]
+  [ text (toString cur) ]
 
 -- =============================================================================
 
-cellStyle : List Int -> Maybe Int -> Int -> List (String, String)
-cellStyle picked lastDrawn cur =
-  if member cur picked
-    then case lastDrawn of
+-- cellStyle : List Int -> Maybe Int -> Int -> List (String, String)
+cellStyle model cur =
+  if member cur model.picked
+    then case model.lastDrawn of
       Nothing -> pickedStyles
       Just x -> if x == cur then lastStyles else pickedStyles
     else defaultStyles

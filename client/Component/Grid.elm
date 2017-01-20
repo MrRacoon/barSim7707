@@ -22,7 +22,7 @@ render model =
       mid  = (length rows) // 2
       (top, btm) =
         rows
-          |> map (map (Cell.render model.picked model.lastDrawn))
+          |> map (map (Cell.render model))
           |> map (div rowAttrs)
           |> \rs -> (take mid rs, drop mid rs)
   in div [] (top ++ [StatusBar.render model] ++ btm)
