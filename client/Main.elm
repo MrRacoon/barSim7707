@@ -27,7 +27,7 @@ type alias Model =
   , pickCount  : Int -- Number of picks to pick each round
   , lastDrawn  : Maybe Int -- Last pick
   , startTime  : Maybe Time -- Round start time
-  -- , endTime : Maybe Time -- Round end time
+  , endTime : Maybe Time -- Round end time
   , curTime    : Time -- Current clock tick
   , state      : State -- Current Game State
   }
@@ -39,7 +39,7 @@ modeli =
   , pickCount = 20
   , lastDrawn = Nothing
   , startTime = Nothing
-  -- , endTime   = Nothing
+  , endTime   = Nothing
   , curTime   = 0
   , state     = DuringGame
   }
@@ -59,6 +59,7 @@ update msg model =
         , lastDrawn = Nothing
         , state     = DuringGame
         , startTime = Nothing
+        , endTime = Nothing
         }
       , Cmd.none
       )
@@ -83,6 +84,7 @@ update msg model =
             | state     = PreGame
             , lastDrawn = Nothing
             , startTime = Nothing
+            , endTime   = Nothing
             }
           , Cmd.none
           )
@@ -103,6 +105,7 @@ update msg model =
           ( { model
             | curTime   = t
             , startTime = Just t
+            , endTime   = Nothing
             }
           , newNumber
           )

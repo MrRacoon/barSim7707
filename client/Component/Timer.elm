@@ -6,8 +6,6 @@ import Time exposing (inMinutes, inSeconds)
 import Date exposing (fromTime, hour, second)
 import String exposing (append)
 
-
-
 render start cur =
   let attrs = [ style [("float", "right")] ]
   in case start of

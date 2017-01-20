@@ -1,13 +1,14 @@
 module Component.Grid exposing (render)
 
 import Html exposing (Html, div)
-import Html.Attributes exposing (style)
-import List exposing (map, take, drop)
+import Html.Attributes exposing (style, class)
+import List exposing (map, take, drop, length)
 import Component.Cell as Cell
 import Component.StatusBar as StatusBar
 
 rowAttrs =
-  [ style
+  [ class "row"
+  , style
     [ ("display", "flex")
     , ("justify-content", "space-between")
     , ("background-color", "darkgrey")
@@ -17,13 +18,14 @@ rowAttrs =
 
 -- render : List Int -> List Int -> Maybe Int -> Html a
 render model =
-  let (top, btm) =
-    byTen model.avail
-      |> map (map (Cell.render model.picked model.lastDrawn))
-      |> map (div rowAttrs)
-      |> \rows -> (take 4 rows, drop 4 rows)
-  in div []
-    (top ++ [StatusBar.render model] ++ btm)
+  let rows = byTen model.avail
+      mid  = (length rows) // 2
+      (top, btm) =
+        rows
+          |> map (map (Cell.render model.picked model.lastDrawn))
+          |> map (div rowAttrs)
+          |> \rs -> (take mid rs, drop mid rs)
+  in div [] (top ++ [StatusBar.render model] ++ btm)
 
 -- =============================================================================
 
