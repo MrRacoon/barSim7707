@@ -14,9 +14,21 @@ baseStyles =
   , ("font-family", "arial")
   ]
 
-pickedStyles  = [("color", "#00FF00"), ("background-color", "green")]
-lastStyles    = [("color", "#0000FF"), ("background-color", "lightblue")]
-defaultStyles = [("color", "#000000")]
+lastStyles =
+  [ ("color", "#0000FF")
+  , ("background-color", "lightblue")
+  , ("border", "3px outset lightblue")
+  ]
+
+pickedStyles =
+  [ ("color", "#00FF00")
+  , ("background-color", "green")
+  , ("border", "3px outset green")
+  ]
+
+defaultStyles =
+  [ ("color", "#000000")
+  ]
 
 styles model cur = style <| baseStyles ++ cellStyle model cur
 

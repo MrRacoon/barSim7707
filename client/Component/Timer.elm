@@ -2,16 +2,17 @@ module Component.Timer exposing (render)
 
 import Html exposing (Html, span, text)
 import Html.Attributes exposing (style)
-import Time exposing (inMinutes, inSeconds)
-import Date exposing (fromTime, hour, second)
 import String exposing (append)
+import Time as Time
+import Date exposing (fromTime, hour, second)
 
-render start cur =
+render model =
   let attrs = [ style [("float", "right")] ]
-  in case start of
+  in case model.startTime of
     Nothing -> span attrs [ text "Timer: ---" ]
     Just s  ->
-      let diff = cur - s
-          min  = hour <| fromTime diff
-          sec  = second <| fromTime diff
-      in span attrs [ text <| ("Timer: " ++ (toString min) ++ ":" ++ (toString sec)) ]
+      let diff = model.curTime - s
+          end  = s * Time.second
+          till = end - model.curTime |> fromTime |> second |> toString
+      in span attrs [ text <| ("Timer: " ++ till) ]
+      -- in span attrs [ text <| ("Next Game in: " ++ till ++ " seconds") ]
