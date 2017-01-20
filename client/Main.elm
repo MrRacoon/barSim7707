@@ -28,7 +28,8 @@ type alias Model =
   , pickCount  : Int -- Number of picks to pick each round
   , lastDrawn  : Maybe Int -- Last pick
   , startTime  : Maybe Time -- Round start time
-  , waitTime   : Float
+  , waitTime   : Time
+  , tickTime   : Time
   , curTime    : Time -- Current clock tick
   , state      : State -- Current Game State
   }
@@ -41,6 +42,7 @@ modeli =
   , lastDrawn = Nothing
   , startTime = Nothing
   , waitTime  = 10 * second
+  , tickTime  = 3 * second
   , curTime   = 0
   , state     = DuringGame
   }
@@ -127,7 +129,7 @@ subscriptions model =
         ]
     DuringGame ->
       Sub.batch
-        [ every second TimerTick
+        [ every model.tickTime TimerTick
         ]
 
 main = program
