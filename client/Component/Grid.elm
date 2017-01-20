@@ -10,8 +10,8 @@ rowAttrs =
   [ style
     [ ("display", "flex")
     , ("justify-content", "space-between")
-    , ("background-color", "grey")
-    , ("border", "5px ridge red")
+    , ("background-color", "darkgrey")
+    -- , ("border", "5px ridge red")
     ]
   ]
 

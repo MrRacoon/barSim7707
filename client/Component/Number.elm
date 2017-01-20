@@ -23,7 +23,7 @@ render : List Int -> Maybe Int -> Int -> Html a
 render picked lastDrawn cur =
   let attrs =
     [ class "cell"
-    , style [ ("border", "5px outset purple")
+    , style [ ("border", "2px outset grey")
             , ("color", numberColor picked lastDrawn cur)
             , ("margin", "5px")
             , ("padding", "5px")
