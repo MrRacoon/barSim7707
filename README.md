@@ -12,8 +12,8 @@ To build the app, clone the repo and use the `Makefile` like so:
 $ make build
 
 # Open the app in a browser
-$ firefox dist/index.html # Linux
-$ open dist/index.html    # Mac
+$ xdg-open dist/index.html # Linux
+$ open dist/index.html     # Mac
 
 # To Clean up after yourself
 $ make clean
