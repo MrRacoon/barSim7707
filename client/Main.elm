@@ -7,7 +7,7 @@ import Html exposing (Html, program, div, span, button, text)
 import Html.Events exposing (onClick)
 import List exposing (map, range, member, length)
 import Random exposing (generate, int)
-import Time exposing (Time, second, every)
+import Time exposing (Time, second, minute, every)
 
 import Component.Grid as Grid
 
@@ -20,6 +20,7 @@ type Message
   | GetNumber
   | NewNumber Int
   | TimerTick Time
+  | WaitTick Time
 
 type alias Model =
   { avail      : List Int -- Available picks
@@ -27,7 +28,7 @@ type alias Model =
   , pickCount  : Int -- Number of picks to pick each round
   , lastDrawn  : Maybe Int -- Last pick
   , startTime  : Maybe Time -- Round start time
-  , waitTime   : Int
+  , waitTime   : Float
   , curTime    : Time -- Current clock tick
   , state      : State -- Current Game State
   }
@@ -36,10 +37,10 @@ modeli : Model
 modeli =
   { avail     = range 1 80
   , picked    = []
-  , pickCount = 20
+  , pickCount = 10
   , lastDrawn = Nothing
   , startTime = Nothing
-  , waitTime  = 240
+  , waitTime  = 10 * second
   , curTime   = 0
   , state     = DuringGame
   }
@@ -67,10 +68,7 @@ update msg model =
     GetNumber ->
       if length model.picked == model.pickCount
         then
-          ( { model
-            | picked    = []
-            , lastDrawn = Nothing
-            }
+          ( { model | picked    = [] , lastDrawn = Nothing }
           , Cmd.none
           )
         else
@@ -91,39 +89,42 @@ update msg model =
           then (model, newNumber)
           else
             ( { model
-              | picked    = x :: model.picked
+              | picked = x :: model.picked
               , lastDrawn = Just x
               }
             , Cmd.none
             )
 
-    TimerTick t ->
+    WaitTick t ->
       case model.startTime of
         Nothing ->
-          ( { model
-            | curTime   = t
-            , startTime = Just t
-            }
-          , newNumber
-          )
-        Just _  ->
-          ( { model
-            | curTime = t
-            }
-          , newNumber
-          )
+          ({ model | curTime = t , startTime = Just t } , Cmd.none)
+        Just s ->
+          if (s + model.waitTime) <= model.curTime
+            then
+              ( { model
+                | startTime = Nothing
+                , state     = DuringGame
+                , picked    = []
+                , lastDrawn = Nothing
+                , curTime   = t
+                }
+              , Cmd.none)
+            else
+              ({ model | curTime = t } , Cmd.none)
+
+    TimerTick t ->
+      (model, newNumber)
 
 view : Model -> Html Message
-view model =
-  div []
-    [ Grid.render model
-    , button [onClick GetNumber] [text "NewNum"] -- dev buttons
-    , button [onClick Reset] [text "Reset"] -- dev buttons
-    ]
+view model = div [] [ Grid.render model ]
 
 subscriptions model =
   case model.state of
-    PreGame -> Sub.none
+    PreGame ->
+      Sub.batch
+        [ every second WaitTick
+        ]
     DuringGame ->
       Sub.batch
         [ every second TimerTick
