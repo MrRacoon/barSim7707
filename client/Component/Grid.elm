@@ -24,10 +24,10 @@ byTen xs =
     [] -> []
     _  -> take 10 xs :: (byTen <| drop 10 xs)
 
-render : List Int -> List Int -> Maybe Int -> Html a
-render avail picked lastDrawn =
-  let grouped = byTen avail
-      rendered = map (map (Component.Number.render picked lastDrawn)) grouped
+-- render : List Int -> List Int -> Maybe Int -> Html a
+render model =
+  let grouped = byTen model.avail
+      rendered = map (map (Component.Number.render model.picked model.lastDrawn)) grouped
       rows = map (div rowAttrs) rendered
       (top, btm) = (take 4 rows, drop 4 rows)
-  in div [] (top ++ [Component.StatusBar.render picked] ++ btm)
+  in div [] (top ++ [Component.StatusBar.render model] ++ btm)

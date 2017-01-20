@@ -79,7 +79,7 @@ update msg model =
 view : Model -> Html Message
 view model =
   div []
-    [ Component.Grid.render model.avail model.picked model.lastDrawn
+    [ Component.Grid.render model
     , button [onClick GetNumber] [text "NewNum"]
     , button [onClick Reset] [text "Reset"]
     ]
