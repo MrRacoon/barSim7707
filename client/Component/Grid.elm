@@ -3,7 +3,7 @@ module Component.Grid exposing (render)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import List exposing (map, take, drop)
-import Component.Number as Cell
+import Component.Cell as Cell
 import Component.StatusBar as StatusBar
 
 rowAttrs =
@@ -15,13 +15,6 @@ rowAttrs =
     ]
   ]
 
-xsByX n xs =
-  case xs of
-    [] -> []
-    _  -> take n xs :: (byTen <| drop n xs)
-
-byTen = xsByX 10
-
 -- render : List Int -> List Int -> Maybe Int -> Html a
 render model =
   let (top, btm) =
@@ -31,3 +24,14 @@ render model =
       |> \rows -> (take 4 rows, drop 4 rows)
   in div []
     (top ++ [StatusBar.render model] ++ btm)
+
+-- =============================================================================
+
+xsByX : Int -> List a -> List (List a)
+xsByX n xs =
+  case xs of
+    [] -> []
+    _  -> take n xs :: (byTen <| drop n xs)
+
+byTen : List a -> List (List a)
+byTen = xsByX 10
