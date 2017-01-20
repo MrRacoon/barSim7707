@@ -1,16 +1,8 @@
 module Component.Number exposing (render)
 
 import Html exposing (Html, span, text)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, class)
 import List exposing (member)
-
-border         = ("border", "5px solid red")
-
-cellAttrs =
-  [ style
-    [ border
-    ]
-  ]
 
 numberColor : List Int -> Maybe Int -> Int -> String
 numberColor picked lastDrawn cur =
@@ -30,7 +22,8 @@ numberColor picked lastDrawn cur =
 render : List Int -> Maybe Int -> Int -> Html a
 render picked lastDrawn cur =
   let attrs =
-    [ style [ ("border", "5px outset purple")
+    [ class "cell"
+    , style [ ("border", "5px outset purple")
             , ("color", numberColor picked lastDrawn cur)
             , ("margin", "5px")
             , ("padding", "5px")
@@ -39,4 +32,5 @@ render picked lastDrawn cur =
             , ("text-align", "center")
             ]
     ]
-  in span attrs [ text (toString cur) ]
+      children = [ text (toString cur) ]
+  in span attrs children
