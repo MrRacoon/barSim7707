@@ -4,7 +4,6 @@ import Platform.Cmd as Cmd
 import Platform.Sub as Sub
 
 import Html exposing (Html, program, div, span, button, text)
-import Html.Events exposing (onClick)
 import List exposing (map, range, member, length)
 import Random exposing (generate, int)
 import Time exposing (Time, second, minute, every)
@@ -47,6 +46,7 @@ modeli =
   , state     = DuringGame
   }
 
+init : (Model, Cmd msg)
 init = (modeli, Cmd.none)
 
 update : Message -> Model -> (Model, Cmd Message)
@@ -121,6 +121,7 @@ update msg model =
 view : Model -> Html Message
 view model = div [] [ Grid.render model ]
 
+subscriptions : { a | state : State, tickTime : Time } -> Sub Message
 subscriptions model =
   case model.state of
     PreGame ->
@@ -132,6 +133,7 @@ subscriptions model =
         [ every model.tickTime TimerTick
         ]
 
+main : Program Never Model Message
 main = program
   { init          = init
   , update        = update
