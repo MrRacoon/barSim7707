@@ -1,12 +1,12 @@
 module GameBoard.View exposing (..)
 
-import List exposing (map)
+import List exposing (map, range)
 import List.Extra exposing (splitAt)
 import Set exposing (member)
 
-import Html exposing (Html, div, span, text)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, span, select, option, text)
+import Html.Attributes exposing (style, value)
+import Html.Events exposing (onClick, onInput)
 import Material.Grid exposing (grid, cell, size, Device(..))
 
 import GameBoard.Types exposing (..)
@@ -30,9 +30,18 @@ selectedStyles = cellStyles ++
   [ ("background-color", "yellow")
   ]
 
+selectedAndPickedStyles : List (String, String)
+selectedAndPickedStyles = cellStyles ++
+  [ ("background-color", "orange")
+  ]
+
 numCell : Model -> String -> Html Msg
 numCell model num =
-  let styles = if member num model.selected then pickedStyles else cellStyles
+  let styles = case (num == model.picked, member num model.selected) of
+    (True, True) -> selectedAndPickedStyles
+    (True, False) -> selectedStyles
+    (False, True) -> pickedStyles
+    (False, False) -> cellStyles
   in span [ onClick (SelectNumber num), style styles ] [ text num ]
 
 createCell : Model -> String -> Material.Grid.Cell Msg
@@ -46,14 +55,25 @@ boardStyles =
   [ ("margin", "10px")
   ]
 
+makeOptions : String -> Html Msg
+makeOptions num = option [ value num ] [ text num ]
+
+options : List (Html Msg)
+options = List.map (makeOptions << toString) (range 1 80)
+
 view : Model -> Html Msg
 view model =
   div [ style boardStyles ]
-    ( model.available
-      |> map (createCell model)
-      |> splitByTen
-      |> map (grid [])
-    )
+    [ div []
+      [ select [ onInput PickNumber ] options
+      ]
+    , div [] (
+      model.available
+        |> map (createCell model)
+        |> splitByTen
+        |> map (grid [])
+      )
+    ]
 
 -- =============================================================================
 
