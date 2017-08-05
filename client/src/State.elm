@@ -5,10 +5,8 @@ import Platform.Cmd as Cmd
 import Platform.Sub as Sub
 
 import Types exposing (..)
+import Constants exposing (serverUrl)
 import UserPage.State as UserPage
-
-wsUrl : String
-wsUrl = "ws://localhost:3000"
 
 init : (Model, Cmd Msg)
 init =
@@ -27,8 +25,8 @@ update msg model =
   case msg of
     Receive "poke"  -> (incrementCount model) ! []
     Receive _       -> model ! []
-    Send            -> model ! [ Sock.send wsUrl "poke" ]
+    Send            -> model ! [ Sock.send serverUrl "poke" ]
     UserPageMsg msg -> { model | user = UserPage.update msg model.user } ! []
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sock.listen wsUrl Receive
+subscriptions model = Sock.listen serverUrl Receive
