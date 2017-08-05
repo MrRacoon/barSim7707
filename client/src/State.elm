@@ -7,11 +7,13 @@ import Platform.Sub as Sub
 import Types exposing (..)
 import Constants exposing (serverUrl)
 import UserPage.State as UserPage
+import GameBoard.State as GameBoard
 
 init : (Model, Cmd Msg)
 init =
   (
     { user = UserPage.init
+    , board = GameBoard.init
     , count = 0
     }
     , Cmd.none
@@ -27,6 +29,7 @@ update msg model =
     Receive _       -> model ! []
     Send            -> model ! [ Sock.send serverUrl "poke" ]
     UserPageMsg msg -> { model | user = UserPage.update msg model.user } ! []
+    GameBoardMsg msg -> { model | board = GameBoard.update msg model.board } ! []
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sock.listen serverUrl Receive
