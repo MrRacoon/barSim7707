@@ -20,6 +20,9 @@ executable server
   build-depends:       base >= 4.7 && < 5
                      , safe
                      , text
+                     , http-types
+                     , random
                      , wai
                      , wai-websockets
+                     , warp
                      , websockets
