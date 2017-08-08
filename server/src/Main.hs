@@ -6,7 +6,9 @@ module Main where
 import qualified Control.Concurrent             as Concurrent
 import qualified Control.Exception              as Exception
 import qualified Control.Monad                  as Monad
+import qualified Data.Aeson                     as JSON
 import qualified Data.List                      as List
+import qualified Data.Map                       as Map
 import qualified Data.Maybe                     as Maybe
 import qualified Data.Text                      as Text
 import qualified Network.HTTP.Types             as Http
@@ -15,40 +17,70 @@ import qualified Network.Wai.Handler.Warp       as Warp
 import qualified Network.Wai.Handler.WebSockets as WS
 import qualified Network.WebSockets             as WS
 import qualified Safe
+import Types
+import Debug.Trace
 
-type ClientId = Int
-type Client   = (ClientId, WS.Connection)
-type State    = [Client]
+-- =============================================================================
+-- Broadcasting
 
-erik = "erk"
-
-nextId :: State -> ClientId
-nextId = Maybe.maybe 0 (1+) . Safe.maximumMay . List.map fst
-
-connectClient :: WS.Connection -> Concurrent.MVar State -> IO ClientId
-connectClient conn stateRef = Concurrent.modifyMVar stateRef $ \state -> do
-  let clientId = nextId state
-  return ((clientId, conn) : state, clientId)
-
-withoutClient :: ClientId -> State -> State
-withoutClient clientId = List.filter ((/=) clientId . fst)
-
-broadcast :: ClientId -> Concurrent.MVar State -> Text.Text -> IO ()
+broadcast :: ClientId -> Concurrent.MVar Model -> Text.Text -> IO ()
 broadcast clientId stateRef msg = do
-  clients <- Concurrent.readMVar stateRef
-  let otherClients = withoutClient clientId clients
-  Monad.forM_ otherClients $ \(_, conn) ->
+  state <- Concurrent.readMVar stateRef
+  let otherClients = map connection $ Map.elems $ players state
+  Monad.forM_ otherClients $ \conn ->
     WS.sendTextData conn msg
 
-listen :: WS.Connection -> ClientId -> Concurrent.MVar State -> IO ()
-listen conn clientId stateRef = Monad.forever $
-  WS.receiveData conn >>= broadcast clientId stateRef
+playerUpdate :: Model -> IO ()
+playerUpdate state = do
+  let ps = Map.elems $ players $ trace (show state) state
+      conns = map connection ps
+      msg = JSON.encode $ UpdatePlayers ps
+  Monad.forM_ conns $ \conn -> WS.sendTextData conn $ trace (show msg) msg
 
-disconnectClient :: ClientId -> Concurrent.MVar State -> IO ()
+-- =============================================================================
+-- (Dis)Connect handlers
+
+connectClient :: WS.Connection -> Concurrent.MVar Model -> IO ClientId
+connectClient conn stateRef =
+  Concurrent.modifyMVar stateRef $ \state -> do
+    let clientId  = nextId state
+        nextState = addPlayer conn state
+    return (trace ("Player Added: " ++ show nextState) nextState, clientId)
+
+disconnectClient :: ClientId -> Concurrent.MVar Model -> IO ()
 disconnectClient clientId stateRef = Concurrent.modifyMVar_ stateRef $ \state ->
-  return $ withoutClient clientId state
+  return $ rmPlayer clientId state
 
-wsApp :: Concurrent.MVar State -> WS.ServerApp
+-- =============================================================================
+-- Listeners
+
+-- listen :: WS.Connection -> ClientId -> Concurrent.MVar Model -> IO ()
+listen conn clientId stateRef = Monad.forever $ do
+  msg <- WS.receiveDataMessage conn
+  case msg of
+    WS.Text t ->
+      let text = JSON.decode t
+      in case text of
+        Just (ClientPick p) -> do
+          state <- Concurrent.readMVar stateRef
+          let newState = updatePlayerPick clientId p state
+          playerUpdate newState
+          Concurrent.putMVar stateRef $ trace (show newState) newState
+        Just (ClientRename n) -> do
+          state <- Concurrent.readMVar stateRef
+          let newState = updatePlayerName clientId n state
+          playerUpdate newState
+          Concurrent.putMVar stateRef $ trace (show newState) newState
+        Nothing -> do
+          state <- Concurrent.readMVar stateRef
+          playerUpdate state
+          Concurrent.putMVar stateRef $ trace (show state) state
+
+
+-- =============================================================================
+-- Apps
+
+wsApp :: Concurrent.MVar Model -> WS.ServerApp
 wsApp stateRef pendingConn = do
   conn <- WS.acceptRequest pendingConn
   clientId <- connectClient conn stateRef
@@ -60,9 +92,11 @@ wsApp stateRef pendingConn = do
 httpApp :: Wai.Application
 httpApp _ respond = respond $ Wai.responseLBS Http.status400 [] "Not a websocket request"
 
+-- =============================================================================
+
 main :: IO ()
 main = do
-  state <- Concurrent.newMVar []
+  state <- Concurrent.newMVar initialModel
   Warp.run 3000 $ WS.websocketsOr
     WS.defaultConnectionOptions
     (wsApp state)

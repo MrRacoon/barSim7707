@@ -18,10 +18,13 @@ executable server
   main-is:             Main.hs
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
-                     , safe
-                     , text
+                     , aeson
+                     , containers
                      , http-types
                      , random
+                     , safe
+                     , text
+                     , time
                      , wai
                      , wai-websockets
                      , warp
