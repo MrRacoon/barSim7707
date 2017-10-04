@@ -5,7 +5,7 @@ INDEX_FILE = ${DIST_DIR}/index.html
 
 build: ${DIST_DIR} ${DIST_FILE} ${INDEX_FILE}
 
-build_full: clean build
+full: clean build
 
 ${INDEX_FILE}: ${DIST_DIR}
 	cp ${SRC_DIR}/index.html ${DIST_DIR}
@@ -21,3 +21,6 @@ reactor:
 
 clean:
 	-rm -rf $(DIST_DIR)
+
+open:
+	xdg-open ${INDEX_FILE}
