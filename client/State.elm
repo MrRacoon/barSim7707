@@ -3,6 +3,8 @@ module State exposing (..)
 import Types exposing (Model, Msg(..), State(..))
 import Time exposing (Time, every, second)
 import Random exposing (generate, int)
+import Ports exposing (ForElmMsg(..), recieve)
+import Debug exposing (log)
 
 
 init : ( Model, Cmd msg )
@@ -16,6 +18,9 @@ init =
       , tickTime = 3 * second
       , curTime = 0
       , state = DuringGame
+      , screenWidth = 300
+      , screenHeight = 300
+      , errors = []
       }
     , Cmd.none
     )
@@ -91,16 +96,33 @@ update msg model =
             TimerTick t ->
                 ( model, newNumber )
 
+            FromJs fromJsMsg ->
+                case fromJsMsg of
+                    NewScreenWidth width ->
+                        { model | screenWidth = log "width" width } ! []
+
+                    NewScreenHeight height ->
+                        { model | screenHeight = log "height" height } ! []
+
+                    _ ->
+                        model ! []
+
+            FromJsErr e ->
+                { model | errors = log "error" e :: model.errors } ! []
+
 
 subscriptions : { a | state : State, tickTime : Time } -> Sub Msg
 subscriptions model =
-    case model.state of
-        PreGame ->
-            Sub.batch
-                [ every second WaitTick
-                ]
+    let
+        timers =
+            case model.state of
+                PreGame ->
+                    [ every second WaitTick
+                    ]
 
-        DuringGame ->
-            Sub.batch
-                [ every model.tickTime TimerTick
-                ]
+                DuringGame ->
+                    [ every model.tickTime TimerTick
+                    ]
+    in
+        Sub.batch
+            (timers ++ [ recieve FromJs FromJsErr ])
