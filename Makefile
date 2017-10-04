@@ -1,12 +1,20 @@
 SRC_DIR  = ./client
 DIST_DIR = ./dist
-DIST_FILE = index.js
+DIST_FILE = ${DIST_DIR}/index.js
+INDEX_FILE = ${DIST_DIR}/index.html
 
-build: index
-	elm make --output=$(DIST_DIR)/$(DIST_FILE) $(SRC_DIR)/Main.elm
+build: ${DIST_DIR} ${DIST_FILE} ${INDEX_FILE}
 
-index:
-	cp $(SRC_DIR)/index.html $(DIST_DIR)
+build_full: clean build
+
+${INDEX_FILE}: ${DIST_DIR}
+	cp ${SRC_DIR}/index.html ${DIST_DIR}
+
+${DIST_FILE}: ${DIST_DIR}
+	elm make --yes --output=${DIST_FILE} ${SRC_DIR}/Main.elm
+
+${DIST_DIR}:
+	mkdir ${DIST_DIR}
 
 reactor:
 	elm reactor
