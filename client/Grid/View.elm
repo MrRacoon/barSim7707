@@ -58,16 +58,16 @@ drawCell : Model -> ( Float, Float ) -> Svg msg
 drawCell model ( xp, yp ) =
     let
         usableXSpace =
-            model.screenWidth - (padding * 12)
+            model.screenWidth - (round <| padding * 12)
 
         usableYSpace =
-            model.screenHeight - (padding * 10)
+            model.screenHeight - (round <| padding * 10)
 
         boxWidth =
-            (usableXSpace / 10)
+            toFloat usableXSpace / 10
 
         boxHeight =
-            usableYSpace / 8
+            toFloat usableYSpace / 8
 
         xVal =
             (xp * (boxWidth + padding)) - boxWidth

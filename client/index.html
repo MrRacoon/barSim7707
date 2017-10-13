@@ -17,25 +17,6 @@
     <script type="text/javascript">
       const elem = document.getElementById('app');
       const app = Elm.Main.embed(elem);
-
-      window.addEventListener('resize', sendScreenSize);
-
-      function sendScreenSize() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        app.ports.forElm.send({
-          tag: 'NewScreenWidth',
-          payload: width,
-        });
-
-        app.ports.forElm.send({
-          tag: 'NewScreenHeight',
-          payload: height,
-        });
-      }
-
-      sendScreenSize();
     </script>
   </body>
 </html>

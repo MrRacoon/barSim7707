@@ -3,26 +3,26 @@ module State exposing (..)
 import Types exposing (Model, Msg(..), State(..))
 import Time exposing (Time, every, second)
 import Random exposing (generate, int)
-import Ports exposing (ForElmMsg(..), recieve)
-import Debug exposing (log)
 import Constants exposing (pickCount)
+import Window exposing (resizes, size)
+import Task exposing (perform)
 
 
-init : ( Model, Cmd msg )
+init : ( Model, Cmd Msg )
 init =
-    ( { avail = List.range 1 80
-      , picked = []
-      , lastDrawn = Nothing
-      , startTime = Nothing
-      , waitTime = 10 * second
-      , tickTime = 3 * second
-      , curTime = 0
-      , state = DuringGame
-      , screenWidth = 300
-      , screenHeight = 300
-      , errors = []
-      }
-    , Cmd.none
+    ({ avail = List.range 1 80
+     , picked = []
+     , lastDrawn = Nothing
+     , startTime = Nothing
+     , waitTime = 10 * second
+     , tickTime = 3 * second
+     , curTime = 0
+     , state = DuringGame
+     , screenWidth = 300
+     , screenHeight = 300
+     , errors = []
+     }
+        ! [ perform ScreenResize size ]
     )
 
 
@@ -36,6 +36,9 @@ update msg model =
             generate NewNumber (int 1 lenAvail)
     in
         case msg of
+            ScreenResize { width, height } ->
+                { model | screenWidth = width, screenHeight = height } ! []
+
             Reset ->
                 ( { model
                     | picked = []
@@ -96,20 +99,6 @@ update msg model =
             TimerTick t ->
                 ( model, newNumber )
 
-            FromJs fromJsMsg ->
-                case fromJsMsg of
-                    NewScreenWidth width ->
-                        { model | screenWidth = log "width" width } ! []
-
-                    NewScreenHeight height ->
-                        { model | screenHeight = log "height" height } ! []
-
-                    _ ->
-                        model ! []
-
-            FromJsErr e ->
-                { model | errors = log "error" e :: model.errors } ! []
-
 
 subscriptions : { a | state : State, tickTime : Time } -> Sub Msg
 subscriptions model =
@@ -125,4 +114,7 @@ subscriptions model =
                     ]
     in
         Sub.batch
-            (timers ++ [ recieve FromJs FromJsErr ])
+            (timers
+                ++ [ resizes ScreenResize
+                   ]
+            )

@@ -1,7 +1,7 @@
 module Types exposing (..)
 
 import Time exposing (Time)
-import Ports exposing (ForElmMsg(..))
+import Window exposing (Size)
 
 
 type State
@@ -15,12 +15,7 @@ type Msg
     | NewNumber Int
     | TimerTick Time
     | WaitTick Time
-    | FromJs ForElmMsg
-    | FromJsErr String
-
-
-type JSMsg
-    = NewScreenWidth Int
+    | ScreenResize Size
 
 
 type alias Model =
@@ -44,7 +39,7 @@ type alias Model =
     , state :
         State
         -- Current Game State
-    , screenWidth : Float
-    , screenHeight : Float
+    , screenWidth : Int
+    , screenHeight : Int
     , errors : List String
     }
