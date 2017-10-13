@@ -3,7 +3,7 @@ module State exposing (..)
 import Types exposing (Model, Msg(..), State(..))
 import Time exposing (Time, every, second)
 import Random exposing (generate, int)
-import Constants exposing (pickCount)
+import Constants exposing (pickCount, waitTime, tickTime)
 import Window exposing (resizes, size)
 import Task exposing (perform)
 
@@ -14,8 +14,6 @@ init =
      , picked = []
      , lastDrawn = Nothing
      , startTime = Nothing
-     , waitTime = 10 * second
-     , tickTime = 3 * second
      , curTime = 0
      , state = DuringGame
      , screenWidth = 300
@@ -83,7 +81,7 @@ update msg model =
                         ( { model | curTime = t, startTime = Just t }, Cmd.none )
 
                     Just s ->
-                        if (s + model.waitTime) <= model.curTime then
+                        if (s + waitTime) <= model.curTime then
                             ( { model
                                 | startTime = Nothing
                                 , state = DuringGame
@@ -100,7 +98,7 @@ update msg model =
                 ( model, newNumber )
 
 
-subscriptions : { a | state : State, tickTime : Time } -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions model =
     let
         timers =
@@ -110,11 +108,7 @@ subscriptions model =
                     ]
 
                 DuringGame ->
-                    [ every model.tickTime TimerTick
+                    [ every tickTime TimerTick
                     ]
     in
-        Sub.batch
-            (timers
-                ++ [ resizes ScreenResize
-                   ]
-            )
+        Sub.batch (timers ++ [ resizes ScreenResize ])

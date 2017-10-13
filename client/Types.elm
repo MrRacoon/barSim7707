@@ -31,8 +31,6 @@ type alias Model =
     , startTime :
         Maybe Time
         -- Round start time
-    , waitTime : Time
-    , tickTime : Time
     , curTime :
         Time
         -- Current clock tick
