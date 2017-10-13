@@ -4,7 +4,18 @@ import Types exposing (Model)
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Svg exposing (Svg, svg, g, rect, text_, text)
-import Svg.Attributes exposing (height, width, x, dx, y, dy, fill, transform)
+import Svg.Attributes
+    exposing
+        ( height
+        , width
+        , x
+        , dx
+        , y
+        , dy
+        , fill
+        , transform
+        , fontSize
+        )
 
 
 padding : Float
@@ -86,8 +97,9 @@ drawCell model ( xp, yp ) =
                 []
             , text_
                 [ fill "black"
-                , y <| toString <| boxHeight / 2
-                , x <| toString <| boxWidth / 2
+                , y <| toString <| boxHeight / 1.5
+                , x <| toString <| boxWidth / 3
+                , fontSize <| toString 40
                 ]
                 [ text <| toString <| xp + (yp * 10) ]
             ]
