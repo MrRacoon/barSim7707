@@ -1,13 +1,13 @@
 module Grid.View exposing (..)
 
 import Types exposing (Model)
-import Html exposing (Html, text)
+import Html exposing (Html)
 import Html.Attributes exposing (style)
-import Svg exposing (Svg, svg, rect)
-import Svg.Attributes exposing (height, width, x, y, fill)
+import Svg exposing (Svg, svg, g, rect, text_, text)
+import Svg.Attributes exposing (height, width, x, dx, y, dy, fill, transform)
 
 
-padding : Int
+padding : Float
 padding =
     10
 
@@ -22,11 +22,11 @@ cells =
     10
 
 
-board : List ( Int, Int )
+board : List ( Float, Float )
 board =
     let
         makeCell yVal xVal =
-            ( xVal, yVal )
+            ( toFloat xVal, toFloat yVal )
 
         makeRow index =
             List.map (makeCell index) (List.range 1 cells)
@@ -43,30 +43,51 @@ view model =
         (List.map (drawCell model) board)
 
 
-drawCell : Model -> ( Int, Int ) -> Svg msg
+drawCell : Model -> ( Float, Float ) -> Svg msg
 drawCell model ( xp, yp ) =
     let
+        usableXSpace =
+            model.screenWidth - (padding * 12)
+
+        usableYSpace =
+            model.screenHeight - (padding * 10)
+
         boxWidth =
-            10
+            (usableXSpace / 10)
 
         boxHeight =
-            10
+            usableYSpace / 8
 
         xVal =
-            xp * (boxWidth + padding)
+            (xp * (boxWidth + padding)) - boxWidth
 
         yVal =
             yp * (boxHeight + padding)
 
+        transformation =
+            transform <| "translate(" ++ toString xVal ++ "," ++ toString yVal ++ ")"
+
         styles =
             []
     in
-        rect
-            [ style styles
-            , width <| toString boxWidth
-            , height <| toString boxHeight
-            , x <| toString xVal
-            , y <| toString yVal
-            , fill "blue"
+        g [ transformation ]
+            [ rect
+                [ fill "black"
+                , width <| toString boxWidth
+                , height <| toString boxHeight
+                ]
+                []
+            , rect
+                [ style styles
+                , width <| toString <| boxWidth - 3
+                , height <| toString <| boxHeight - 3
+                , fill "blue"
+                ]
+                []
+            , text_
+                [ fill "black"
+                , y <| toString <| boxHeight / 2
+                , x <| toString <| boxWidth / 2
+                ]
+                [ text <| toString <| xp + (yp * 10) ]
             ]
-            []
