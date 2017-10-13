@@ -12,18 +12,24 @@
       const elem = document.getElementById('app');
       const app = Elm.Main.embed(elem);
 
-      window.addEventListener('resize', function () {
+      window.addEventListener('resize', sendScreenSize);
+
+      function sendScreenSize() {
         const width = window.innerWidth;
         const height = window.innerHeight;
+
         app.ports.forElm.send({
           tag: 'NewScreenWidth',
-          payload: width
-        })
+          payload: width,
+        });
+
         app.ports.forElm.send({
           tag: 'NewScreenHeight',
-          payload: height
-        })
-      });
+          payload: height,
+        });
+      }
+
+      sendScreenSize();
     </script>
   </body>
 </html>

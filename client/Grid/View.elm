@@ -1,42 +1,72 @@
 module Grid.View exposing (..)
 
 import Types exposing (Model)
-import Html exposing (Html, div, span, text)
-import Html.Attributes exposing (style, height, width)
+import Html exposing (Html, text)
+import Html.Attributes exposing (style)
+import Svg exposing (Svg, svg, rect)
+import Svg.Attributes exposing (height, width, x, y, fill)
+
+
+padding : Int
+padding =
+    10
+
+
+rows : Int
+rows =
+    8
+
+
+cells : Int
+cells =
+    10
+
+
+board : List ( Int, Int )
+board =
+    let
+        makeCell yVal xVal =
+            ( xVal, yVal )
+
+        makeRow index =
+            List.map (makeCell index) (List.range 1 cells)
+    in
+        List.concatMap makeRow (List.range 0 (rows - 1))
 
 
 view : Model -> Html msg
 view model =
+    svg
+        [ height <| toString model.screenHeight
+        , width <| toString model.screenWidth
+        ]
+        (List.map (drawCell model) board)
+
+
+drawCell : Model -> ( Int, Int ) -> Svg msg
+drawCell model ( xp, yp ) =
     let
-        heightBound =
-            model.screenHeight / 16
+        boxWidth =
+            10
 
-        widthBound =
-            model.screenWidth / 20
+        boxHeight =
+            10
 
-        boxBounds =
-            if heightBound < widthBound then
-                heightBound
-            else
-                widthBound
-    in
-        div []
-            (List.map (mkCell boxBounds) (List.range 1 80))
+        xVal =
+            xp * (boxWidth + padding)
 
-
-mkCell : Float -> Int -> Html msg
-mkCell bound num =
-    let
-        left =
-            (((num - 1) % 10) * round bound * 2)
+        yVal =
+            yp * (boxHeight + padding)
 
         styles =
-            [ ( "position", "absolute" )
-            , ( "padding", toString bound ++ "px" )
-            , ( "left", toString left ++ "px" )
-            , ( "width", toString (left + ((round bound) * 2)) ++ "px" )
-            , ( "top", toString (floor (toFloat (num - 1) / 10) * round bound) ++ "px" )
-            , ( "border", "1px black dotted" )
-            ]
+            []
     in
-        span [ style styles ] [ text <| toString num ]
+        rect
+            [ style styles
+            , width <| toString boxWidth
+            , height <| toString boxHeight
+            , x <| toString xVal
+            , y <| toString yVal
+            , fill "blue"
+            ]
+            []
