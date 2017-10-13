@@ -16,3 +16,30 @@ waitTime =
 tickTime : Time
 tickTime =
     3 * second
+
+
+padding : Float
+padding =
+    10
+
+
+rows : Int
+rows =
+    8
+
+
+cells : Int
+cells =
+    10
+
+
+board : List ( Float, Float )
+board =
+    let
+        makeCell yVal xVal =
+            ( toFloat xVal, toFloat yVal )
+
+        makeRow index =
+            List.map (makeCell index) (List.range 1 cells)
+    in
+        List.concatMap makeRow (List.range 0 (rows - 1))

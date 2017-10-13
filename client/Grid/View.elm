@@ -1,6 +1,7 @@
 module Grid.View exposing (..)
 
 import Types exposing (Model)
+import Constants exposing (board, padding)
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Svg exposing (Svg, svg, g, rect, text_, text)
@@ -18,45 +19,29 @@ import Svg.Attributes
         )
 
 
-padding : Float
-padding =
-    10
-
-
-rows : Int
-rows =
-    8
-
-
-cells : Int
-cells =
-    10
-
-
-board : List ( Float, Float )
-board =
-    let
-        makeCell yVal xVal =
-            ( toFloat xVal, toFloat yVal )
-
-        makeRow index =
-            List.map (makeCell index) (List.range 1 cells)
-    in
-        List.concatMap makeRow (List.range 0 (rows - 1))
-
-
 view : Model -> Html msg
 view model =
     svg
         [ height <| toString model.screenHeight
         , width <| toString model.screenWidth
         ]
-        (List.map (drawCell model) board)
+        ([ rect
+            [ height <| toString model.screenHeight
+            , width <| toString model.screenWidth
+            , fill "grey"
+            ]
+            []
+         ]
+            ++ (List.map (drawCell model) board)
+        )
 
 
 drawCell : Model -> ( Float, Float ) -> Svg msg
 drawCell model ( xp, yp ) =
     let
+        number =
+            round <| xp + (yp * 10)
+
         usableXSpace =
             model.screenWidth - (round <| padding * 12)
 
@@ -75,6 +60,19 @@ drawCell model ( xp, yp ) =
         yVal =
             yp * (boxHeight + padding)
 
+        fillColor =
+            case model.lastDrawn of
+                Nothing ->
+                    "blue"
+
+                Just num ->
+                    if (num == number) then
+                        "lightblue"
+                    else if (List.member number model.picked) then
+                        "yellow"
+                    else
+                        "blue"
+
         transformation =
             transform <| "translate(" ++ toString xVal ++ "," ++ toString yVal ++ ")"
 
@@ -83,6 +81,14 @@ drawCell model ( xp, yp ) =
     in
         g [ transformation ]
             [ rect
+                [ fill "lightgrey"
+                , width <| toString <| boxWidth + 3
+                , height <| toString <| boxHeight + 3
+                , x <| toString -3
+                , y <| toString -3
+                ]
+                []
+            , rect
                 [ fill "black"
                 , width <| toString boxWidth
                 , height <| toString boxHeight
@@ -92,7 +98,7 @@ drawCell model ( xp, yp ) =
                 [ style styles
                 , width <| toString <| boxWidth - 3
                 , height <| toString <| boxHeight - 3
-                , fill "blue"
+                , fill fillColor
                 ]
                 []
             , text_
