@@ -5,13 +5,13 @@ import Time exposing (Time, every, second)
 import Random exposing (generate, int)
 import Ports exposing (ForElmMsg(..), recieve)
 import Debug exposing (log)
+import Constants exposing (pickCount)
 
 
 init : ( Model, Cmd msg )
 init =
     ( { avail = List.range 1 80
       , picked = []
-      , pickCount = 10
       , lastDrawn = Nothing
       , startTime = Nothing
       , waitTime = 10 * second
@@ -48,7 +48,7 @@ update msg model =
 
             -- For manual intervention
             GetNumber ->
-                if List.length model.picked == model.pickCount then
+                if List.length model.picked == pickCount then
                     ( { model | picked = [], lastDrawn = Nothing }
                     , Cmd.none
                     )
@@ -56,7 +56,7 @@ update msg model =
                     ( model, newNumber )
 
             NewNumber x ->
-                if List.length model.picked == model.pickCount then
+                if List.length model.picked == pickCount then
                     ( { model
                         | state = PreGame
                         , lastDrawn = Nothing

@@ -30,9 +30,6 @@ type alias Model =
     , picked :
         List Int
         -- Already picked
-    , pickCount :
-        Int
-        -- Number of picks to pick each round
     , lastDrawn :
         Maybe Int
         -- Last pick
