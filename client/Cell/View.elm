@@ -1,7 +1,6 @@
 module Cell.View exposing (..)
 
 import Html exposing (Html, div, text)
-import Cell.Types exposing (Model, Msg(..))
 import Constants exposing (padding)
 import Utils exposing (numberCoordinates)
 import Svg exposing (Svg, g, rect, text_)
@@ -20,7 +19,7 @@ import Svg.Attributes
         )
 
 
-view : Int -> Int -> ( Int, Model ) -> Svg msg
+view : Int -> Int -> ( Int, Animation.State ) -> Svg msg
 view sHeight sWidth ( number, styles ) =
     let
         ( xp, yp ) =

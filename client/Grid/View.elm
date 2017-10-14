@@ -2,8 +2,8 @@ module Grid.View exposing (..)
 
 import Grid.Types exposing (Model, Msg(..))
 import Cell.View as Cell
-import Cell.Types as CellTypes
 import Array
+import Animation
 import Svg exposing (Svg, svg, rect)
 import Svg.Attributes exposing (height, width, fill)
 
@@ -25,6 +25,6 @@ view sHeight sWidth model =
         )
 
 
-makeCell : Int -> Int -> ( Int, CellTypes.Model ) -> Svg Msg
+makeCell : Int -> Int -> ( Int, Animation.State ) -> Svg Msg
 makeCell h w ( i, s ) =
-    Svg.map (CellMsg i) (Cell.view h w ( i, s ))
+    (Cell.view h w ( i, s ))

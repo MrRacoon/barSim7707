@@ -1,43 +1,67 @@
 module Grid.State exposing (..)
 
-import Constants exposing (cells, rows, totalNumbers)
 import Grid.Types exposing (Model, Msg(..))
-import Cell.State as Cell
-import Cell.Types as CellTypes
 import Array
+import Animation
+import Color exposing (blue, green)
 
 
-board : List CellTypes.Model
-board =
-    List.repeat totalNumbers (Cell.init)
+initialStyles : List Animation.Property
+initialStyles =
+    [ Animation.fill blue ]
 
 
 init : ( Model, Cmd Msg )
 init =
-    (Array.fromList board)
+    (Array.fromList (List.repeat 80 (Animation.style initialStyles)))
         ! []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        CellMsg index cmsg ->
+        Animate index aMsg ->
             case Array.get index model of
                 Nothing ->
                     model ! []
 
                 Just elem ->
-                    let
-                        ( cellState, cellCmd ) =
-                            Cell.update cmsg elem
-                    in
-                        Array.set index cellState model
-                            ! [ Cmd.map (CellMsg index) cellCmd ]
+                    Array.set index (Animation.update aMsg elem) model
+                        ! []
+
+        Reset ->
+            (Array.map
+                (Animation.interrupt
+                    [ Animation.set
+                        [ Animation.fill blue
+                        ]
+                    ]
+                )
+                model
+            )
+                ! []
+
+        Pick index ->
+            case Array.get index model of
+                Nothing ->
+                    model ! []
+
+                Just elem ->
+                    Array.set index
+                        (Animation.interrupt
+                            [ Animation.to
+                                [ Animation.fill green
+                                ]
+                            ]
+                            elem
+                        )
+                        model
+                        ! []
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     model
-        |> Array.indexedMap (\i s -> Sub.map (CellMsg i) <| Cell.subscriptions s)
+        |> Array.indexedMap (\i s -> Animation.subscription (Animate i) [ s ])
         |> Array.toList
         |> Sub.batch

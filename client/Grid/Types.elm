@@ -1,12 +1,14 @@
 module Grid.Types exposing (..)
 
-import Cell.Types as Cell
 import Array
+import Animation
 
 
 type alias Model =
-    Array.Array Cell.Model
+    Array.Array Animation.State
 
 
 type Msg
-    = CellMsg Int Cell.Msg
+    = Reset
+    | Animate Int Animation.Msg
+    | Pick Int

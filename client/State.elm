@@ -8,7 +8,6 @@ import Window exposing (resizes, size)
 import Task exposing (perform)
 import Grid.State as Grid
 import Grid.Types as GridTypes
-import Cell.Types as CellTypes
 
 
 init : ( Model, Cmd Msg )
@@ -48,20 +47,20 @@ update msg model =
                 { model | screenWidth = width, screenHeight = height } ! []
 
             Reset ->
-                ( { model
+                ({ model
                     | picked = []
                     , lastDrawn = Nothing
                     , state = DuringGame
                     , startTime = Nothing
-                  }
-                , Cmd.none
+                 }
+                    ! []
                 )
 
             -- For manual intervention
             GetNumber ->
                 if List.length model.picked == pickCount then
-                    ( { model | picked = [], lastDrawn = Nothing }
-                    , Cmd.none
+                    ({ model | picked = [], lastDrawn = Nothing }
+                        ! []
                     )
                 else
                     ( model, newNumber )
@@ -80,7 +79,7 @@ update msg model =
                 else
                     let
                         ( gridState, gridCmd ) =
-                            Grid.update (GridTypes.CellMsg x (CellTypes.Pick)) model.grid
+                            Grid.update (GridTypes.Pick x) model.grid
                     in
                         ({ model
                             | picked = x :: model.picked
@@ -93,21 +92,31 @@ update msg model =
             WaitTick t ->
                 case model.startTime of
                     Nothing ->
-                        ( { model | curTime = t, startTime = Just t }, Cmd.none )
+                        ( { model
+                            | curTime = t
+                            , startTime = Just t
+                          }
+                        , Cmd.none
+                        )
 
                     Just s ->
-                        if (s + waitTime) <= model.curTime then
-                            ( { model
-                                | startTime = Nothing
-                                , state = DuringGame
-                                , picked = []
-                                , lastDrawn = Nothing
-                                , curTime = t
-                              }
-                            , Cmd.none
-                            )
-                        else
+                        if (s + waitTime) < model.curTime then
                             ( { model | curTime = t }, Cmd.none )
+                        else
+                            let
+                                ( gridState, gridCmd ) =
+                                    Grid.update GridTypes.Reset model.grid
+                            in
+                                ({ model
+                                    | startTime = Nothing
+                                    , state = DuringGame
+                                    , picked = []
+                                    , lastDrawn = Nothing
+                                    , curTime = t
+                                    , grid = gridState
+                                 }
+                                    ! [ Cmd.map GridMsg gridCmd ]
+                                )
 
             TimerTick _ ->
                 ( model, newNumber )
