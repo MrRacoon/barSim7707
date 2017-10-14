@@ -3,6 +3,7 @@ module Grid.State exposing (..)
 import Grid.Types exposing (Model, Msg(..))
 import Array
 import Animation
+import Utils exposing (location)
 import Color exposing (blue, green, red, yellow)
 
 
@@ -17,8 +18,8 @@ init =
     , ball =
         Animation.style
             [ Animation.fill yellow
-            , Animation.cx 10
-            , Animation.cy 10
+            , Animation.cx -10
+            , Animation.cy -10
             , Animation.radius 10
             ]
     }
@@ -57,38 +58,50 @@ update msg model =
             }
                 ! []
 
-        Pick index ->
+        Pick h w index ->
             case Array.get index model.cells of
                 Nothing ->
                     model ! []
 
                 Just elem ->
-                    { model
-                        | ball =
-                            (Animation.interrupt
-                                [ Animation.set
-                                    [ Animation.fill red
-                                    , Animation.radius 20
-                                    ]
-                                , Animation.to
-                                    [ Animation.fill yellow
-                                    , Animation.radius 10
-                                    ]
-                                ]
-                                model.ball
-                            )
-                        , cells =
-                            Array.set index
+                    let
+                        loc =
+                            location h w index
+                    in
+                        { model
+                            | ball =
                                 (Animation.interrupt
-                                    [ Animation.to
-                                        [ Animation.fill green
+                                    [ Animation.set
+                                        [ Animation.fill red
+                                        , Animation.radius 200
+                                        , Animation.cx (toFloat w / 2)
+                                        , Animation.cy -100
+                                        , Animation.opacity 1
+                                        ]
+                                    , Animation.to
+                                        [ Animation.fill yellow
+                                        , Animation.radius 50
+                                        , Animation.cx (loc.x + (loc.width / 2))
+                                        , Animation.cy (loc.y + (loc.height / 2))
+                                        ]
+                                    , Animation.set
+                                        [ Animation.opacity 0
                                         ]
                                     ]
-                                    elem
+                                    model.ball
                                 )
-                                model.cells
-                    }
-                        ! []
+                            , cells =
+                                Array.set index
+                                    (Animation.interrupt
+                                        [ Animation.to
+                                            [ Animation.fill green
+                                            ]
+                                        ]
+                                        elem
+                                    )
+                                    model.cells
+                        }
+                            ! []
 
 
 subscriptions : Model -> Sub Msg

@@ -14,4 +14,4 @@ type Msg
     = Reset
     | AnimateCell Int Animation.Msg
     | AnimateBall Animation.Msg
-    | Pick Int
+    | Pick Int Int Int
