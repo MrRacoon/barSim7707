@@ -1,6 +1,6 @@
 module Grid.Types exposing (..)
 
-import Animation as Anim
+import Animation
 
 
 type alias Model =
@@ -12,8 +12,4 @@ type Msg
 
 
 type Number
-    = Number Int Styles
-
-
-type alias Styles =
-    List Anim.State
+    = Number Float Animation.State

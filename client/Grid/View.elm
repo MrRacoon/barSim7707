@@ -1,9 +1,9 @@
 module Grid.View exposing (..)
 
-import Types exposing (Model)
+import Grid.Types exposing (Model, Number(..))
+import Grid.Utils exposing (numberCoordinates)
 import Constants exposing (board, padding)
-import Html exposing (Html)
-import Html.Attributes exposing (style)
+import Animation
 import Svg exposing (Svg, svg, g, rect, text_, text)
 import Svg.Attributes
     exposing
@@ -19,34 +19,37 @@ import Svg.Attributes
         )
 
 
-view : Model -> Html msg
-view model =
+view : Int -> Int -> Model -> Svg msg
+view sHeight sWidth model =
     svg
-        [ height <| toString model.screenHeight
-        , width <| toString model.screenWidth
+        [ height <| toString sHeight
+        , width <| toString sWidth
         ]
         ([ rect
-            [ height <| toString model.screenHeight
-            , width <| toString model.screenWidth
+            [ height <| toString sHeight
+            , width <| toString sWidth
             , fill "grey"
             ]
             []
          ]
-            ++ (List.map (drawCell model) board)
+            ++ (List.map (drawCell sHeight sWidth) model.numbers)
         )
 
 
-drawCell : Model -> ( Float, Float ) -> Svg msg
-drawCell model ( xp, yp ) =
+drawCell : Int -> Int -> Number -> Svg msg
+drawCell sHeight sWidth (Number num styles) =
     let
+        ( xp, yp ) =
+            numberCoordinates num
+
         number =
             round <| xp + (yp * 10)
 
         usableXSpace =
-            model.screenWidth - (round <| padding * 12)
+            sWidth - (round <| padding * 12)
 
         usableYSpace =
-            model.screenHeight - (round <| padding * 10)
+            sHeight - (round <| padding * 10)
 
         boxWidth =
             toFloat usableXSpace / 10
@@ -60,24 +63,8 @@ drawCell model ( xp, yp ) =
         yVal =
             yp * (boxHeight + padding)
 
-        fillColor =
-            case model.lastDrawn of
-                Nothing ->
-                    "blue"
-
-                Just num ->
-                    if (num == number) then
-                        "lightblue"
-                    else if (List.member number model.picked) then
-                        "yellow"
-                    else
-                        "blue"
-
         transformation =
             transform <| "translate(" ++ toString xVal ++ "," ++ toString yVal ++ ")"
-
-        styles =
-            []
     in
         g [ transformation ]
             [ rect
@@ -95,11 +82,13 @@ drawCell model ( xp, yp ) =
                 ]
                 []
             , rect
-                [ style styles
-                , width <| toString <| boxWidth - 3
-                , height <| toString <| boxHeight - 3
-                , fill fillColor
-                ]
+                (List.concat
+                    [ Animation.render styles
+                    , [ width <| toString <| boxWidth - 3
+                      , height <| toString <| boxHeight - 3
+                      ]
+                    ]
+                )
                 []
             , text_
                 [ fill "black"

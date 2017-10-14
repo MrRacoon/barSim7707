@@ -7,4 +7,5 @@ import Grid.View as Grid
 
 view : Model -> Html Msg
 view model =
-    div [] [ Grid.view model ]
+    div []
+        [ Grid.view model.screenHeight model.screenWidth model.grid ]

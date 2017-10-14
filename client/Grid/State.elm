@@ -2,13 +2,20 @@ module Grid.State exposing (..)
 
 import Constants exposing (cells, rows, totalNumbers)
 import Grid.Types exposing (Model, Msg, Number(..))
+import Color exposing (green)
+import Animation
 
 
 board : List Number
 board =
     let
+        initStyles =
+            Animation.style
+                [ Animation.fill green
+                ]
+
         makeNum n =
-            Number n []
+            Number (toFloat n) initStyles
     in
         List.map makeNum (List.range 1 (totalNumbers))
 
