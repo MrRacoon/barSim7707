@@ -21,7 +21,8 @@ view sHeight sWidth model =
             ]
             []
          ]
-            ++ (List.map (makeCell sHeight sWidth) (Array.toIndexedList model))
+            ++ (List.map (makeCell sHeight sWidth) (Array.toIndexedList model.cells))
+            ++ []
         )
 
 

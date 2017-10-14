@@ -5,7 +5,9 @@ import Animation
 
 
 type alias Model =
-    Array.Array Animation.State
+    { cells : Array.Array Animation.State
+    , ball : Animation.State
+    }
 
 
 type Msg
