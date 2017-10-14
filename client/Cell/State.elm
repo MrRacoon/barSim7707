@@ -2,7 +2,7 @@ module Cell.State exposing (..)
 
 import Cell.Types exposing (Model, Msg(..))
 import Animation
-import Color exposing (blue)
+import Color exposing (blue, green)
 
 
 initialStyles : List Animation.Property
@@ -10,30 +10,30 @@ initialStyles =
     [ Animation.fill blue ]
 
 
-init : Float -> ( Model, Cmd Msg )
-init n =
-    { number = n
-    , style = Animation.style initialStyles
-    }
-        ! []
+init : Model
+init =
+    Animation.style initialStyles
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Pick ->
-            { model | style = Animation.interrupt [] model.style } ! []
+            Animation.interrupt
+                [ Animation.to
+                    [ Animation.fill green ]
+                ]
+                model
+                ! []
 
         Reset ->
-            { model
-                | style = Animation.interrupt [ Animation.to initialStyles ] model.style
-            }
+            Animation.interrupt [ Animation.to initialStyles ] model
                 ! []
 
         Animate amsg ->
-            { model | style = Animation.update amsg model.style } ! []
+            Animation.update amsg model ! []
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Animation.subscription Animate [ model.style ]
+    Animation.subscription Animate [ model ]

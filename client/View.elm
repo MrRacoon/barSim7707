@@ -1,6 +1,6 @@
 module View exposing (..)
 
-import Types exposing (Model, Msg)
+import Types exposing (Model, Msg(..))
 import Html exposing (Html, div)
 import Grid.View as Grid
 
@@ -8,4 +8,6 @@ import Grid.View as Grid
 view : Model -> Html Msg
 view model =
     div []
-        [ Grid.view model.screenHeight model.screenWidth model.grid ]
+        [ Html.map GridMsg <|
+            Grid.view model.screenHeight model.screenWidth model.grid
+        ]

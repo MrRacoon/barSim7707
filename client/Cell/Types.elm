@@ -4,9 +4,7 @@ import Animation
 
 
 type alias Model =
-    { number : Float
-    , style : Animation.State
-    }
+    Animation.State
 
 
 type Msg

@@ -8,6 +8,7 @@ import Window exposing (resizes, size)
 import Task exposing (perform)
 import Grid.State as Grid
 import Grid.Types as GridTypes
+import Cell.Types as CellTypes
 
 
 init : ( Model, Cmd Msg )
@@ -79,7 +80,7 @@ update msg model =
                 else
                     let
                         ( gridState, gridCmd ) =
-                            Grid.update (GridTypes.PickNumber x) model.grid
+                            Grid.update (GridTypes.CellMsg x (CellTypes.Pick)) model.grid
                     in
                         ({ model
                             | picked = x :: model.picked
@@ -132,4 +133,9 @@ subscriptions model =
                     [ every tickTime TimerTick
                     ]
     in
-        Sub.batch (timers ++ [ resizes ScreenResize ])
+        Sub.batch
+            ([ resizes ScreenResize
+             , Sub.map GridMsg (Grid.subscriptions model.grid)
+             ]
+                ++ timers
+            )

@@ -1,4 +1,4 @@
-module Grid.Utils exposing (..)
+module Utils exposing (..)
 
 import Animation
 import Color exposing (blue, green)

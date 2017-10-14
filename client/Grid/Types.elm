@@ -1,12 +1,12 @@
 module Grid.Types exposing (..)
 
-import Animation
-import Dict exposing (Dict)
+import Cell.Types as Cell
+import Array
 
 
 type alias Model =
-    Dict Int Animation.State
+    Array.Array Cell.Model
 
 
 type Msg
-    = PickNumber Int
+    = CellMsg Int Cell.Msg

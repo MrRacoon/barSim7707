@@ -2,39 +2,42 @@ module Grid.State exposing (..)
 
 import Constants exposing (cells, rows, totalNumbers)
 import Grid.Types exposing (Model, Msg(..))
-import Grid.Utils exposing (pickNumber)
-import Color exposing (green)
-import Animation
-import Dict as Dict
+import Cell.State as Cell
+import Cell.Types as CellTypes
+import Array
 
 
-board : List ( Int, Animation.State )
+board : List CellTypes.Model
 board =
-    let
-        initStyles =
-            Animation.style
-                [ Animation.fill green
-                ]
-
-        makeNum n =
-            ( n, initStyles )
-    in
-        List.map makeNum (List.range 1 (totalNumbers))
+    List.repeat totalNumbers (Cell.init)
 
 
 init : ( Model, Cmd Msg )
 init =
-    (Dict.fromList board)
+    (Array.fromList board)
         ! []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        PickNumber num ->
-            (Dict.map pickNumber model) ! []
+        CellMsg index cmsg ->
+            case Array.get index model of
+                Nothing ->
+                    model ! []
+
+                Just elem ->
+                    let
+                        ( cellState, cellCmd ) =
+                            Cell.update cmsg elem
+                    in
+                        Array.set index cellState model
+                            ! [ Cmd.map (CellMsg index) cellCmd ]
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    model
+        |> Array.indexedMap (\i s -> Sub.map (CellMsg i) <| Cell.subscriptions s)
+        |> Array.toList
+        |> Sub.batch
