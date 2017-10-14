@@ -33,6 +33,11 @@ cells =
     10
 
 
+totalNumbers : Int
+totalNumbers =
+    80
+
+
 board : List ( Float, Float )
 board =
     let

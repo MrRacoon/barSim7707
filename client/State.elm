@@ -6,22 +6,30 @@ import Random exposing (generate, int)
 import Constants exposing (pickCount, waitTime, tickTime)
 import Window exposing (resizes, size)
 import Task exposing (perform)
+import Grid.State as Grid
 
 
 init : ( Model, Cmd Msg )
 init =
-    ({ avail = List.range 1 80
-     , picked = []
-     , lastDrawn = Nothing
-     , startTime = Nothing
-     , curTime = 0
-     , state = DuringGame
-     , screenWidth = 300
-     , screenHeight = 300
-     , errors = []
-     }
-        ! [ perform ScreenResize size ]
-    )
+    let
+        ( gridState, gridCmd ) =
+            Grid.init
+    in
+        ({ avail = List.range 1 80
+         , picked = []
+         , lastDrawn = Nothing
+         , startTime = Nothing
+         , curTime = 0
+         , state = DuringGame
+         , screenWidth = 300
+         , screenHeight = 300
+         , errors = []
+         , grid = gridState
+         }
+            ! [ perform ScreenResize size
+              , Cmd.map GridMsg gridCmd
+              ]
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -96,6 +104,13 @@ update msg model =
 
             TimerTick t ->
                 ( model, newNumber )
+
+            GridMsg gmsg ->
+                let
+                    ( gridState, gridCmd ) =
+                        Grid.update gmsg model.grid
+                in
+                    { model | grid = gridState } ! [ Cmd.map GridMsg gridCmd ]
 
 
 subscriptions : Model -> Sub Msg
