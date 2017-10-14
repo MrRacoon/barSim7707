@@ -7,6 +7,7 @@ import Constants exposing (pickCount, waitTime, tickTime)
 import Window exposing (resizes, size)
 import Task exposing (perform)
 import Grid.State as Grid
+import Grid.Types as GridTypes
 
 
 init : ( Model, Cmd Msg )
@@ -76,12 +77,17 @@ update msg model =
                 else if List.member x model.picked then
                     ( model, newNumber )
                 else
-                    ( { model
-                        | picked = x :: model.picked
-                        , lastDrawn = Just x
-                      }
-                    , Cmd.none
-                    )
+                    let
+                        ( gridState, gridCmd ) =
+                            Grid.update (GridTypes.PickNumber x) model.grid
+                    in
+                        ({ model
+                            | picked = x :: model.picked
+                            , lastDrawn = Just x
+                            , grid = gridState
+                         }
+                            ! [ Cmd.map GridMsg gridCmd ]
+                        )
 
             WaitTick t ->
                 case model.startTime of
@@ -102,7 +108,7 @@ update msg model =
                         else
                             ( { model | curTime = t }, Cmd.none )
 
-            TimerTick t ->
+            TimerTick _ ->
                 ( model, newNumber )
 
             GridMsg gmsg ->

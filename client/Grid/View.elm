@@ -1,9 +1,10 @@
 module Grid.View exposing (..)
 
-import Grid.Types exposing (Model, Number(..))
+import Grid.Types exposing (Model)
 import Grid.Utils exposing (numberCoordinates)
 import Constants exposing (board, padding)
 import Animation
+import Dict as Dict
 import Svg exposing (Svg, svg, g, rect, text_, text)
 import Svg.Attributes
     exposing
@@ -32,18 +33,15 @@ view sHeight sWidth model =
             ]
             []
          ]
-            ++ (List.map (drawCell sHeight sWidth) model.numbers)
+            ++ (List.map (drawCell sHeight sWidth) (Dict.toList model))
         )
 
 
-drawCell : Int -> Int -> Number -> Svg msg
-drawCell sHeight sWidth (Number num styles) =
+drawCell : Int -> Int -> ( Int, Animation.State ) -> Svg msg
+drawCell sHeight sWidth ( num, styles ) =
     let
         ( xp, yp ) =
             numberCoordinates num
-
-        number =
-            round <| xp + (yp * 10)
 
         usableXSpace =
             sWidth - (round <| padding * 12)
@@ -68,26 +66,10 @@ drawCell sHeight sWidth (Number num styles) =
     in
         g [ transformation ]
             [ rect
-                [ fill "lightgrey"
-                , width <| toString <| boxWidth + 3
-                , height <| toString <| boxHeight + 3
-                , x <| toString -3
-                , y <| toString -3
-                ]
-                []
-            , rect
-                [ fill "black"
-                , width <| toString boxWidth
-                , height <| toString boxHeight
-                ]
-                []
-            , rect
-                (List.concat
-                    [ Animation.render styles
-                    , [ width <| toString <| boxWidth - 3
-                      , height <| toString <| boxHeight - 3
-                      ]
-                    ]
+                (Animation.render styles
+                    ++ [ width <| toString <| boxWidth - 3
+                       , height <| toString <| boxHeight - 3
+                       ]
                 )
                 []
             , text_

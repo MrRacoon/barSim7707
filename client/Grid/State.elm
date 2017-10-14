@@ -1,12 +1,14 @@
 module Grid.State exposing (..)
 
 import Constants exposing (cells, rows, totalNumbers)
-import Grid.Types exposing (Model, Msg, Number(..))
+import Grid.Types exposing (Model, Msg(..))
+import Grid.Utils exposing (pickNumber)
 import Color exposing (green)
 import Animation
+import Dict as Dict
 
 
-board : List Number
+board : List ( Int, Animation.State )
 board =
     let
         initStyles =
@@ -15,21 +17,22 @@ board =
                 ]
 
         makeNum n =
-            Number (toFloat n) initStyles
+            ( n, initStyles )
     in
         List.map makeNum (List.range 1 (totalNumbers))
 
 
 init : ( Model, Cmd Msg )
 init =
-    { numbers = board
-    }
+    (Dict.fromList board)
         ! []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    model ! []
+    case msg of
+        PickNumber num ->
+            (Dict.map pickNumber model) ! []
 
 
 subscriptions : Model -> Sub Msg

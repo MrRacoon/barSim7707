@@ -1,15 +1,12 @@
 module Grid.Types exposing (..)
 
 import Animation
+import Dict exposing (Dict)
 
 
 type alias Model =
-    { numbers : List Number }
+    Dict Int Animation.State
 
 
 type Msg
-    = FadeToColor String
-
-
-type Number
-    = Number Float Animation.State
+    = PickNumber Int
