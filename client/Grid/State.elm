@@ -3,7 +3,7 @@ module Grid.State exposing (..)
 import Grid.Types exposing (Model, Msg(..))
 import Array
 import Animation
-import Color exposing (blue, green)
+import Color exposing (blue, green, red, yellow)
 
 
 initialStyles : List Animation.Property
@@ -14,7 +14,13 @@ initialStyles =
 init : ( Model, Cmd Msg )
 init =
     { cells = (Array.fromList (List.repeat 80 (Animation.style initialStyles)))
-    , ball = Animation.style []
+    , ball =
+        Animation.style
+            [ Animation.fill yellow
+            , Animation.cx 10
+            , Animation.cy 10
+            , Animation.radius 10
+            ]
     }
         ! []
 
@@ -22,7 +28,10 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Animate index aMsg ->
+        AnimateBall aMsg ->
+            { model | ball = Animation.update aMsg model.ball } ! []
+
+        AnimateCell index aMsg ->
             case Array.get index model.cells of
                 Nothing ->
                     model ! []
@@ -55,7 +64,20 @@ update msg model =
 
                 Just elem ->
                     { model
-                        | cells =
+                        | ball =
+                            (Animation.interrupt
+                                [ Animation.set
+                                    [ Animation.fill red
+                                    , Animation.radius 20
+                                    ]
+                                , Animation.to
+                                    [ Animation.fill yellow
+                                    , Animation.radius 10
+                                    ]
+                                ]
+                                model.ball
+                            )
+                        , cells =
                             Array.set index
                                 (Animation.interrupt
                                     [ Animation.to
@@ -71,7 +93,13 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    model.cells
-        |> Array.indexedMap (\i s -> Animation.subscription (Animate i) [ s ])
-        |> Array.toList
-        |> Sub.batch
+    let
+        ballAnimations =
+            Animation.subscription AnimateBall [ model.ball ]
+
+        boxAnimations =
+            model.cells
+                |> Array.indexedMap (\i s -> Animation.subscription (AnimateCell i) [ s ])
+                |> Array.toList
+    in
+        Sub.batch <| boxAnimations ++ [ ballAnimations ]

@@ -12,5 +12,6 @@ type alias Model =
 
 type Msg
     = Reset
-    | Animate Int Animation.Msg
+    | AnimateCell Int Animation.Msg
+    | AnimateBall Animation.Msg
     | Pick Int

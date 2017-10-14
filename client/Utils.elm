@@ -2,6 +2,52 @@ module Utils exposing (..)
 
 import Animation
 import Color exposing (blue, green)
+import Constants exposing (padding)
+
+
+type alias Location =
+    { num : Int
+    , col : Float
+    , row : Float
+    , height : Float
+    , width : Float
+    , x : Float
+    , y : Float
+    }
+
+
+location : Int -> Int -> Int -> Location
+location screenHeight screenWidth num =
+    let
+        ( col, row ) =
+            numberCoordinates num
+
+        usableXSpace =
+            screenWidth - (round <| padding * 12)
+
+        usableYSpace =
+            screenHeight - (round <| padding * 10)
+
+        boxWidth =
+            toFloat usableXSpace / 10
+
+        boxHeight =
+            toFloat usableYSpace / 8
+
+        x =
+            (col * (boxWidth + padding)) - boxWidth
+
+        y =
+            row * (boxHeight + padding)
+    in
+        { num = num
+        , height = boxHeight
+        , width = boxWidth
+        , row = row
+        , col = col
+        , x = x
+        , y = y
+        }
 
 
 numberCoordinates : Int -> ( Float, Float )
@@ -34,7 +80,3 @@ fillBlue style =
 
 
 -- pickNumber : Maybe Animation.State -> Maybe Animation.State
-
-
-pickNumber _ maybeStyles =
-    fillBlue maybeStyles

@@ -1,8 +1,7 @@
 module Cell.View exposing (..)
 
 import Html exposing (Html, div, text)
-import Constants exposing (padding)
-import Utils exposing (numberCoordinates)
+import Utils exposing (location)
 import Svg exposing (Svg, g, rect, text_)
 import Animation
 import Svg.Attributes
@@ -22,43 +21,25 @@ import Svg.Attributes
 view : Int -> Int -> ( Int, Animation.State ) -> Svg msg
 view sHeight sWidth ( number, styles ) =
     let
-        ( xp, yp ) =
-            numberCoordinates number
-
-        usableXSpace =
-            sWidth - (round <| padding * 12)
-
-        usableYSpace =
-            sHeight - (round <| padding * 10)
-
-        boxWidth =
-            toFloat usableXSpace / 10
-
-        boxHeight =
-            toFloat usableYSpace / 8
-
-        xVal =
-            (xp * (boxWidth + padding)) - boxWidth
-
-        yVal =
-            yp * (boxHeight + padding)
+        loc =
+            location sHeight sWidth number
 
         transformation =
-            transform <| "translate(" ++ toString xVal ++ "," ++ toString yVal ++ ")"
+            transform <| "translate(" ++ toString loc.x ++ "," ++ toString loc.y ++ ")"
     in
         g [ transformation ]
             [ rect
                 (Animation.render styles
-                    ++ [ width <| toString <| boxWidth - 3
-                       , height <| toString <| boxHeight - 3
+                    ++ [ width <| toString <| loc.width - 3
+                       , height <| toString <| loc.height - 3
                        ]
                 )
                 []
             , text_
                 [ fill "black"
-                , y <| toString <| boxHeight / 1.5
-                , x <| toString <| boxWidth / 3
+                , y <| toString <| loc.height / 1.5
+                , x <| toString <| loc.width / 3
                 , fontSize <| toString 40
                 ]
-                [ text <| toString <| xp + (yp * 10) ]
+                [ text <| toString <| loc.col + (loc.row * 10) ]
             ]
