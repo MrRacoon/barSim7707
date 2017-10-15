@@ -79,7 +79,7 @@ update msg model =
                 else
                     let
                         ( gridState, gridCmd ) =
-                            Grid.update (GridTypes.Pick model.screenHeight model.screenWidth x) model.grid
+                            Grid.update (GridTypes.Pick x) model.grid
                     in
                         ({ model
                             | picked = x :: model.picked

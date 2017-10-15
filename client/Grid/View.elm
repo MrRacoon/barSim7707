@@ -10,27 +10,10 @@ import Svg.Attributes exposing (height, width, fill, transform, cx, cy, r)
 
 view : Int -> Int -> Model -> Svg Msg
 view sHeight sWidth model =
-    svg
-        [ height <| toString sHeight
-        , width <| toString sWidth
-        ]
-        ([ rect
-            [ height <| toString sHeight
-            , width <| toString sWidth
-            , fill "grey"
-            ]
-            []
-         ]
-            ++ (List.map (makeCell sHeight sWidth) (Array.toIndexedList model.cells))
+    svg [ height <| toString sHeight, width <| toString sWidth ]
+        ([ rect [ height <| toString sHeight, width <| toString sWidth, fill "grey" ] [] ]
+            ++ (List.map Cell.view (Array.toList model.cells))
             ++ [ g [ transform "translate(0,0)" ]
-                    [ circle
-                        (Animation.render model.ball)
-                        []
-                    ]
+                    [ circle (Animation.render model.ball) [] ]
                ]
         )
-
-
-makeCell : Int -> Int -> ( Int, Animation.State ) -> Svg Msg
-makeCell h w ( i, s ) =
-    (Cell.view h w ( i, s ))
