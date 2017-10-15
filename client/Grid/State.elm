@@ -1,6 +1,7 @@
 module Grid.State exposing (..)
 
 import Cell.State as Cell
+import Status.State as Status
 import Cell.Types as CellTypes
 import Grid.Types exposing (Model, Msg(..))
 import Dict
@@ -12,6 +13,9 @@ import Color exposing (black, blue, red, yellow)
 init : ( Model, Cmd Msg )
 init =
     let
+        ( statusState, statusCmd ) =
+            Status.init
+
         newCells =
             List.map (\i -> ( i, Cell.init i )) <| List.range 1 80
 
@@ -30,18 +34,13 @@ init =
                 , Animation.cy -10
                 , Animation.radius 10
                 ]
-        , status =
-            Animation.style
-                [ Animation.attr "height" 20 "%"
-                , Animation.attr "width" 0 "%"
-                , Animation.x 0
-                , Animation.attr "y" 40 "%"
-                , Animation.fill black
-                ]
+        , status = statusState
         , height = 300
         , width = 300
         }
-            ! cellCmd
+            ! (cellCmd
+                ++ [ Cmd.map StatusMsg statusCmd ]
+              )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -84,19 +83,6 @@ update msg model =
                     | height = h
                     , width = w
                     , cells = Dict.fromList cellState
-                    , status =
-                        Animation.interrupt
-                            [ Animation.to
-                                [ Animation.attr "height" 20 "%"
-                                , Animation.attr "width" 100 "%"
-                                , Animation.x 0
-                                , Animation.attr "y" 40 "%"
-                                , Animation.fill black
-                                ]
-                            , Animation.to
-                                [ Animation.attr "width" 0 "5" ]
-                            ]
-                            model.status
                 }
                     ! cellCmd
 
@@ -104,9 +90,13 @@ update msg model =
             { model | ball = Animation.update aMsg model.ball }
                 ! []
 
-        StatusMsg aMsg ->
-            { model | status = Animation.update aMsg model.status }
-                ! []
+        StatusMsg sMsg ->
+            let
+                ( statusState, statusCmd ) =
+                    Status.update sMsg model.status
+            in
+                { model | status = statusState }
+                    ! [ Cmd.map StatusMsg statusCmd ]
 
         CellMsg index cellMsg ->
             case Maybe.map (Cell.update cellMsg) <| Dict.get index model.cells of
@@ -161,7 +151,7 @@ subscriptions model =
             Animation.subscription BallMsg [ model.ball ]
 
         statusAnimations =
-            Animation.subscription StatusMsg [ model.status ]
+            Sub.map StatusMsg <| Status.subscriptions model.status
 
         boxAnimations =
             model.cells
