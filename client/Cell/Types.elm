@@ -19,3 +19,5 @@ type Msg
     | UpdatePosition Float Float
     | UpdateScreenSize Int Int
     | UpdateColor Color
+    | Picked
+    | Reset

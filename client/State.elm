@@ -56,14 +56,19 @@ update msg model =
                         ! [ Cmd.map GridMsg gridCmd ]
 
             Reset ->
-                ({ model
-                    | picked = []
-                    , lastDrawn = Nothing
-                    , state = DuringGame
-                    , startTime = Nothing
-                 }
-                    ! []
-                )
+                let
+                    ( gridState, gridCmd ) =
+                        Grid.update GridTypes.Reset model.grid
+                in
+                    ({ model
+                        | picked = []
+                        , lastDrawn = Nothing
+                        , state = DuringGame
+                        , startTime = Nothing
+                        , grid = gridState
+                     }
+                        ! [ Cmd.map GridMsg gridCmd ]
+                    )
 
             -- For manual intervention
             GetNumber ->

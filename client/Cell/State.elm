@@ -3,8 +3,7 @@ module Cell.State exposing (..)
 import Animation
 import Cell.Types exposing (Model, Msg(..))
 import Utils exposing (location)
-import Color exposing (blue)
-import Debug exposing (log)
+import Color exposing (blue, yellow)
 
 
 init : Int -> ( Model, Cmd Msg )
@@ -43,8 +42,7 @@ update msg model =
         UpdateScreenSize height width ->
             let
                 loc =
-                    log "loc"
-                        (location height width model.num)
+                    location height width model.num
             in
                 { model
                     | g =
@@ -97,6 +95,31 @@ update msg model =
                     Animation.interrupt
                         [ Animation.to
                             [ Animation.fill c
+                            ]
+                        ]
+                        model.rect
+            }
+                ! []
+
+        Picked ->
+            { model
+                | rect =
+                    Animation.interrupt
+                        [ Animation.wait 1300
+                        , Animation.to
+                            [ Animation.fill yellow
+                            ]
+                        ]
+                        model.rect
+            }
+                ! []
+
+        Reset ->
+            { model
+                | rect =
+                    Animation.interrupt
+                        [ Animation.to
+                            [ Animation.fill blue
                             ]
                         ]
                         model.rect

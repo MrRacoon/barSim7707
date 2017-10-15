@@ -5,7 +5,8 @@ import Cell.Types as CellTypes
 import Grid.Types exposing (Model, Msg(..))
 import Dict
 import Animation
-import Color exposing (blue, green, red, yellow)
+import Utils exposing (location)
+import Color exposing (blue, red, yellow)
 
 
 init : ( Model, Cmd Msg )
@@ -39,8 +40,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Reset ->
-            model
-                ! []
+            let
+                newCells =
+                    model.cells
+                        |> Dict.toList
+                        |> List.map (\( i, c ) -> ( i, Cell.update CellTypes.Reset c ))
+
+                cellState =
+                    newCells
+                        |> List.map (\( i, c ) -> ( i, Tuple.first c ))
+
+                cellCmd =
+                    newCells
+                        |> List.map (\( i, c ) -> Cmd.map (CellMsg i) (Tuple.second c))
+            in
+                { model | cells = Dict.fromList cellState }
+                    ! cellCmd
 
         Resize h w ->
             let
@@ -73,8 +88,41 @@ update msg model =
                     { model | cells = Dict.insert index cellState model.cells }
                         ! [ Cmd.map (CellMsg index) cellCmd ]
 
-        _ ->
-            model ! []
+        Pick index ->
+            case Maybe.map (Cell.update CellTypes.Picked) <| Dict.get index model.cells of
+                Nothing ->
+                    model ! []
+
+                Just ( cellState, cellCmd ) ->
+                    let
+                        loc =
+                            location model.height model.width index
+                    in
+                        { model
+                            | cells = Dict.insert index cellState model.cells
+                            , ball =
+                                Animation.interrupt
+                                    [ Animation.set
+                                        [ Animation.cx (toFloat model.width / 2)
+                                        , Animation.cy -1000
+                                        , Animation.radius 1000
+                                        , Animation.opacity 1
+                                        , Animation.fill red
+                                        ]
+                                    , Animation.to
+                                        [ Animation.cx (loc.x + (loc.width / 2))
+                                        , Animation.cy (loc.y + (loc.height / 2))
+                                        , Animation.radius 50
+                                        , Animation.opacity 0.8
+                                        , Animation.fill yellow
+                                        ]
+                                    , Animation.to
+                                        [ Animation.opacity 0
+                                        ]
+                                    ]
+                                    model.ball
+                        }
+                            ! [ Cmd.map (CellMsg index) cellCmd ]
 
 
 subscriptions : Model -> Sub Msg
