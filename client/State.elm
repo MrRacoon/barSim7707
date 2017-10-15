@@ -44,7 +44,16 @@ update msg model =
     in
         case msg of
             ScreenResize { width, height } ->
-                { model | screenWidth = width, screenHeight = height } ! []
+                let
+                    ( gridState, gridCmd ) =
+                        Grid.update (GridTypes.Resize height width) model.grid
+                in
+                    { model
+                        | screenWidth = width
+                        , screenHeight = height
+                        , grid = gridState
+                    }
+                        ! [ Cmd.map GridMsg gridCmd ]
 
             Reset ->
                 ({ model

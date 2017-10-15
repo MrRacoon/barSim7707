@@ -9,5 +9,5 @@ view : Model -> Html Msg
 view model =
     div []
         [ Html.map GridMsg <|
-            Grid.view model.screenHeight model.screenWidth model.grid
+            Grid.view model.grid
         ]
