@@ -66,9 +66,14 @@ update msg model =
                     , text =
                         Animation.interrupt
                             [ Animation.set
-                                [ Animation.x (loc.width / 4)
-                                , Animation.y (loc.height / 1.3)
-                                , Animation.custom "font-size" 50 "px"
+                                [ Animation.x
+                                    (if loc.num < 10 then
+                                        (loc.width / 4)
+                                     else
+                                        (loc.width / 12)
+                                    )
+                                , Animation.y (loc.height - 10)
+                                , Animation.custom "font-size" loc.height "px"
                                 , Animation.exactly "font-family" "Verdana"
                                 ]
                             ]
