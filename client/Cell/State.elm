@@ -4,6 +4,7 @@ import Animation
 import Cell.Types exposing (Model, Msg(..))
 import Utils exposing (location)
 import Color exposing (blue)
+import Debug exposing (log)
 
 
 init : Int -> ( Model, Cmd Msg )
@@ -14,8 +15,9 @@ init num =
             [ Animation.translate (Animation.px 0) (Animation.px 0) ]
     , rect =
         Animation.style
-            [ Animation.height (Animation.px 10)
-            , Animation.width (Animation.px 10)
+            [ Animation.attr "height" 10 ""
+            , Animation.attr "width" 10 ""
+            , Animation.fill blue
             ]
     , text =
         Animation.style
@@ -41,7 +43,8 @@ update msg model =
         UpdateScreenSize height width ->
             let
                 loc =
-                    location height width model.num
+                    log "loc"
+                        (location height width model.num)
             in
                 { model
                     | g =
@@ -56,8 +59,8 @@ update msg model =
                     , rect =
                         Animation.interrupt
                             [ Animation.set
-                                [ Animation.width (Animation.px loc.width)
-                                , Animation.height (Animation.px loc.height)
+                                [ Animation.attr "height" loc.height ""
+                                , Animation.attr "width" loc.width ""
                                 , Animation.fill blue
                                 ]
                             ]
@@ -65,9 +68,10 @@ update msg model =
                     , text =
                         Animation.interrupt
                             [ Animation.set
-                                [ Animation.x (loc.width / 2)
-                                , Animation.y (loc.height / 2)
-                                , Animation.custom "font-size" 20 "px"
+                                [ Animation.x (loc.width / 4)
+                                , Animation.y (loc.height / 1.3)
+                                , Animation.custom "font-size" 50 "px"
+                                , Animation.exactly "font-family" "Verdana"
                                 ]
                             ]
                             model.text

@@ -12,7 +12,7 @@ init : ( Model, Cmd Msg )
 init =
     let
         newCells =
-            List.map (\i -> ( i, Cell.init i )) <| List.range 1 20
+            List.map (\i -> ( i, Cell.init i )) <| List.range 1 80
 
         cellState =
             newCells |> List.map (\( i, c ) -> ( i, Tuple.first c ))
