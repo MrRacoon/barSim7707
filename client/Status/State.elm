@@ -9,6 +9,7 @@ init : ( Model, Cmd Msg )
 init =
     { isShown = False
     , time = 0
+    , message = "Next game starts soon"
     , g = Animation.style []
     , rect =
         Animation.style
@@ -31,6 +32,9 @@ update msg model =
 
         UpdateTimer val ->
             { model | time = val } ! []
+
+        UpdateMessage str ->
+            { model | message = str } ! []
 
         UpdateG amsg ->
             { model | g = Animation.update amsg model.g } ! []

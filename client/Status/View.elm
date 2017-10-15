@@ -9,5 +9,5 @@ view : Model -> Svg msg
 view model =
     g (Animation.render model.g)
         [ rect (Animation.render model.rect) []
-        , text_ (Animation.render model.text) []
+        , text_ (Animation.render model.text) [ text model.message ]
         ]
