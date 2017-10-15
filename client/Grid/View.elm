@@ -2,6 +2,7 @@ module Grid.View exposing (..)
 
 import Grid.Types exposing (Model, Msg(..))
 import Cell.View as Cell
+import Status.View as Status
 import Dict
 import Animation
 import Svg exposing (Svg, svg, rect, circle, g)
@@ -19,7 +20,6 @@ view model =
             []
          ]
             ++ (List.map Cell.view (Dict.values model.cells))
-            ++ [ g [ transform "translate(0,0)" ]
-                    [ circle (Animation.render model.ball) [] ]
-               ]
+            ++ [ circle (Animation.render model.ball) [] ]
+            ++ [ Status.view model.status ]
         )

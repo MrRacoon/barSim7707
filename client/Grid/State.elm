@@ -6,7 +6,7 @@ import Grid.Types exposing (Model, Msg(..))
 import Dict
 import Animation
 import Utils exposing (location)
-import Color exposing (blue, red, yellow)
+import Color exposing (black, blue, red, yellow)
 
 
 init : ( Model, Cmd Msg )
@@ -29,6 +29,14 @@ init =
                 , Animation.cx -10
                 , Animation.cy -10
                 , Animation.radius 10
+                ]
+        , status =
+            Animation.style
+                [ Animation.attr "height" 20 "%"
+                , Animation.attr "width" 0 "%"
+                , Animation.x 0
+                , Animation.attr "y" 40 "%"
+                , Animation.fill black
                 ]
         , height = 300
         , width = 300
@@ -72,11 +80,32 @@ update msg model =
                     newCells
                         |> List.map (\( i, c ) -> Cmd.map (CellMsg i) (Tuple.second c))
             in
-                { model | height = h, width = w, cells = Dict.fromList cellState }
+                { model
+                    | height = h
+                    , width = w
+                    , cells = Dict.fromList cellState
+                    , status =
+                        Animation.interrupt
+                            [ Animation.to
+                                [ Animation.attr "height" 20 "%"
+                                , Animation.attr "width" 100 "%"
+                                , Animation.x 0
+                                , Animation.attr "y" 40 "%"
+                                , Animation.fill black
+                                ]
+                            , Animation.to
+                                [ Animation.attr "width" 0 "5" ]
+                            ]
+                            model.status
+                }
                     ! cellCmd
 
         BallMsg aMsg ->
             { model | ball = Animation.update aMsg model.ball }
+                ! []
+
+        StatusMsg aMsg ->
+            { model | status = Animation.update aMsg model.status }
                 ! []
 
         CellMsg index cellMsg ->
@@ -131,9 +160,12 @@ subscriptions model =
         ballAnimations =
             Animation.subscription BallMsg [ model.ball ]
 
+        statusAnimations =
+            Animation.subscription StatusMsg [ model.status ]
+
         boxAnimations =
             model.cells
                 |> Dict.toList
                 |> List.map (\( i, s ) -> Sub.map (CellMsg i) <| Cell.subscriptions s)
     in
-        Sub.batch <| [ ballAnimations ] ++ boxAnimations
+        Sub.batch <| [ ballAnimations, statusAnimations ] ++ boxAnimations

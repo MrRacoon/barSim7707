@@ -8,6 +8,7 @@ import Cell.Types as Cell
 type alias Model =
     { cells : Dict.Dict Int Cell.Model
     , ball : Animation.State
+    , status : Animation.State
     , height : Int
     , width : Int
     }
@@ -19,3 +20,4 @@ type Msg
     | Resize Int Int
     | CellMsg Int Cell.Msg
     | BallMsg Animation.Msg
+    | StatusMsg Animation.Msg
