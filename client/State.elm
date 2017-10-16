@@ -3,7 +3,7 @@ module State exposing (..)
 import Types exposing (Model, Msg(..), State(..))
 import Time exposing (Time, every, second)
 import Random exposing (generate, int)
-import Constants exposing (pickCount, waitTime, tickTime)
+import Constants exposing (pickCount, waitTime, tickTime, rows, cols)
 import Window exposing (resizes, size)
 import Task exposing (perform)
 import Grid.State as Grid
@@ -21,7 +21,7 @@ init =
         ( statusState, statusCmd ) =
             Status.init
     in
-        ({ avail = List.range 1 10
+        ({ avail = List.range 1 (cols * rows)
          , picked = []
          , lastDrawn = Nothing
          , startTime = Nothing
