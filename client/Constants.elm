@@ -5,12 +5,12 @@ import Time exposing (Time, second)
 
 pickCount : Int
 pickCount =
-    3
+    20
 
 
 waitTime : Time
 waitTime =
-    5 * second
+    120 * second
 
 
 tickTime : Time
