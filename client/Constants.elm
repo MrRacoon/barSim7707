@@ -10,7 +10,7 @@ pickCount =
 
 waitTime : Time
 waitTime =
-    120 * second
+    30 * second
 
 
 tickTime : Time

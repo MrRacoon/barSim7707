@@ -91,14 +91,20 @@ update msg model =
                     let
                         ( statusState, statusCmd ) =
                             Status.update (StatusTypes.Show True) model.status
+
+                        ( gridState, gridCmd ) =
+                            Grid.update (GridTypes.Summary model.picked) model.grid
                     in
                         ({ model
                             | state = PreGame
                             , lastDrawn = Nothing
                             , startTime = Nothing
                             , status = statusState
+                            , grid = gridState
                          }
-                            ! [ Cmd.map StatusMsg statusCmd ]
+                            ! [ Cmd.map StatusMsg statusCmd
+                              , Cmd.map GridMsg gridCmd
+                              ]
                         )
                 else if List.member x model.picked then
                     ( model, newNumber )

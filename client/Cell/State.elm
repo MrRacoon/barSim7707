@@ -11,7 +11,9 @@ init num =
     { num = num
     , g =
         Animation.style
-            [ Animation.translate (Animation.px 0) (Animation.px 0) ]
+            [ Animation.translate (Animation.px 0) (Animation.px 0)
+            , Animation.opacity 1
+            ]
     , rect =
         Animation.style
             [ Animation.attr "height" 10 ""
@@ -126,6 +128,39 @@ update msg model =
                         [ Animation.to
                             [ Animation.fill blue
                             ]
+                        ]
+                        model.rect
+            }
+                ! []
+
+        Hide ->
+            { model
+                | g =
+                    Animation.interrupt
+                        [ Animation.to
+                            [ Animation.opacity 0
+                            ]
+                        ]
+                        model.g
+            }
+                ! []
+
+        MoveTo loc ->
+            { model
+                | g =
+                    Animation.interrupt
+                        [ Animation.to
+                            [ Animation.translate
+                                (Animation.px loc.x)
+                                (Animation.px loc.y)
+                            , Animation.opacity 1
+                            ]
+                        ]
+                        model.g
+                , rect =
+                    Animation.interrupt
+                        [ Animation.to
+                            [ Animation.fill blue ]
                         ]
                         model.rect
             }

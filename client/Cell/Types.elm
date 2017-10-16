@@ -2,6 +2,7 @@ module Cell.Types exposing (..)
 
 import Animation
 import Color exposing (Color)
+import Utils exposing (Location)
 
 
 type alias Model =
@@ -21,3 +22,5 @@ type Msg
     | UpdateColor Color
     | Picked
     | Reset
+    | MoveTo Location
+    | Hide

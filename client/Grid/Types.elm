@@ -3,6 +3,7 @@ module Grid.Types exposing (..)
 import Animation
 import Dict
 import Cell.Types as Cell
+import Utils exposing (Location)
 
 
 type alias Model =
@@ -19,3 +20,4 @@ type Msg
     | Resize Int Int
     | CellMsg Int Cell.Msg
     | BallMsg Animation.Msg
+    | Summary (List Int)

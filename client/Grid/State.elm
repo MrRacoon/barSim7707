@@ -8,6 +8,7 @@ import Animation
 import Utils exposing (location)
 import Color exposing (black, blue, red, yellow)
 import Constants exposing (rows, cols)
+import List.Extra as ListE
 
 
 init : ( Model, Cmd Msg )
@@ -45,7 +46,12 @@ update msg model =
                 newCells =
                     model.cells
                         |> Dict.toList
-                        |> List.map (\( i, c ) -> ( i, Cell.update CellTypes.Reset c ))
+                        |> List.map
+                            (\( i, c ) ->
+                                ( i
+                                , Cell.update (CellTypes.MoveTo <| location model.height model.width i) c
+                                )
+                            )
 
                 cellState =
                     newCells
@@ -128,6 +134,39 @@ update msg model =
                                     model.ball
                         }
                             ! [ Cmd.map (CellMsg index) cellCmd ]
+
+        Summary picked ->
+            let
+                newCells =
+                    model.cells
+                        |> Dict.toList
+                        |> List.map
+                            (\( i, c ) ->
+                                ( i
+                                , case ListE.elemIndex i picked of
+                                    Nothing ->
+                                        Cell.update CellTypes.Hide c
+
+                                    Just index ->
+                                        let
+                                            loc =
+                                                location model.height model.width (index + 21)
+                                        in
+                                            Cell.update (CellTypes.MoveTo loc) c
+                                )
+                            )
+
+                cellState =
+                    newCells
+                        |> List.map (\( i, c ) -> ( i, Tuple.first c ))
+                        |> Dict.fromList
+
+                cellCmd =
+                    newCells
+                        |> List.map (\( i, c ) -> Cmd.map (CellMsg i) (Tuple.second c))
+            in
+                { model | cells = cellState }
+                    ! cellCmd
 
 
 subscriptions : Model -> Sub Msg
