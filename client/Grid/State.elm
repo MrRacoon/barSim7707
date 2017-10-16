@@ -1,23 +1,20 @@
 module Grid.State exposing (..)
 
 import Cell.State as Cell
-import Status.State as Status
 import Cell.Types as CellTypes
 import Grid.Types exposing (Model, Msg(..))
 import Dict
 import Animation
 import Utils exposing (location)
 import Color exposing (black, blue, red, yellow)
+import Constants exposing (rows, cols)
 
 
 init : ( Model, Cmd Msg )
 init =
     let
-        ( statusState, statusCmd ) =
-            Status.init
-
         newCells =
-            List.map (\i -> ( i, Cell.init i )) <| List.range 1 80
+            List.map (\i -> ( i, Cell.init i )) <| List.range 1 (rows * cols)
 
         cellState =
             newCells |> List.map (\( i, c ) -> ( i, Tuple.first c ))
@@ -34,13 +31,10 @@ init =
                 , Animation.cy -10
                 , Animation.radius 10
                 ]
-        , status = statusState
         , height = 300
         , width = 300
         }
-            ! (cellCmd
-                ++ [ Cmd.map StatusMsg statusCmd ]
-              )
+            ! cellCmd
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,14 +83,6 @@ update msg model =
         BallMsg aMsg ->
             { model | ball = Animation.update aMsg model.ball }
                 ! []
-
-        StatusMsg sMsg ->
-            let
-                ( statusState, statusCmd ) =
-                    Status.update sMsg model.status
-            in
-                { model | status = statusState }
-                    ! [ Cmd.map StatusMsg statusCmd ]
 
         CellMsg index cellMsg ->
             case Maybe.map (Cell.update cellMsg) <| Dict.get index model.cells of
@@ -150,12 +136,9 @@ subscriptions model =
         ballAnimations =
             Animation.subscription BallMsg [ model.ball ]
 
-        statusAnimations =
-            Sub.map StatusMsg <| Status.subscriptions model.status
-
         boxAnimations =
             model.cells
                 |> Dict.toList
                 |> List.map (\( i, s ) -> Sub.map (CellMsg i) <| Cell.subscriptions s)
     in
-        Sub.batch <| [ ballAnimations, statusAnimations ] ++ boxAnimations
+        Sub.batch <| [ ballAnimations ] ++ boxAnimations

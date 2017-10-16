@@ -5,12 +5,12 @@ import Time exposing (Time, second)
 
 pickCount : Int
 pickCount =
-    10
+    3
 
 
 waitTime : Time
 waitTime =
-    30 * second
+    5 * second
 
 
 tickTime : Time
@@ -28,8 +28,8 @@ rows =
     8
 
 
-cells : Int
-cells =
+cols : Int
+cols =
     10
 
 
@@ -45,6 +45,6 @@ board =
             ( toFloat xVal, toFloat yVal )
 
         makeRow index =
-            List.map (makeCell index) (List.range 1 cells)
+            List.map (makeCell index) (List.range 1 cols)
     in
         List.concatMap makeRow (List.range 0 (rows - 1))

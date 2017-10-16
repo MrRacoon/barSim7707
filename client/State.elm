@@ -8,6 +8,8 @@ import Window exposing (resizes, size)
 import Task exposing (perform)
 import Grid.State as Grid
 import Grid.Types as GridTypes
+import Status.State as Status
+import Status.Types as StatusTypes
 
 
 init : ( Model, Cmd Msg )
@@ -15,8 +17,11 @@ init =
     let
         ( gridState, gridCmd ) =
             Grid.init
+
+        ( statusState, statusCmd ) =
+            Status.init
     in
-        ({ avail = List.range 1 80
+        ({ avail = List.range 1 10
          , picked = []
          , lastDrawn = Nothing
          , startTime = Nothing
@@ -26,9 +31,11 @@ init =
          , screenHeight = 300
          , errors = []
          , grid = gridState
+         , status = statusState
          }
             ! [ perform ScreenResize size
               , Cmd.map GridMsg gridCmd
+              , Cmd.map StatusMsg statusCmd
               ]
         )
 
@@ -81,13 +88,18 @@ update msg model =
 
             NewNumber x ->
                 if List.length model.picked == pickCount then
-                    ( { model
-                        | state = PreGame
-                        , lastDrawn = Nothing
-                        , startTime = Nothing
-                      }
-                    , Cmd.none
-                    )
+                    let
+                        ( statusState, statusCmd ) =
+                            Status.update (StatusTypes.Show True) model.status
+                    in
+                        ({ model
+                            | state = PreGame
+                            , lastDrawn = Nothing
+                            , startTime = Nothing
+                            , status = statusState
+                         }
+                            ! [ Cmd.map StatusMsg statusCmd ]
+                        )
                 else if List.member x model.picked then
                     ( model, newNumber )
                 else
@@ -115,11 +127,12 @@ update msg model =
 
                     Just s ->
                         if (s + waitTime) < model.curTime then
-                            ( { model | curTime = t }, Cmd.none )
-                        else
                             let
                                 ( gridState, gridCmd ) =
                                     Grid.update GridTypes.Reset model.grid
+
+                                ( statusState, statusCmd ) =
+                                    Status.update (StatusTypes.Show False) model.status
                             in
                                 ({ model
                                     | startTime = Nothing
@@ -128,9 +141,14 @@ update msg model =
                                     , lastDrawn = Nothing
                                     , curTime = t
                                     , grid = gridState
+                                    , status = statusState
                                  }
-                                    ! [ Cmd.map GridMsg gridCmd ]
+                                    ! [ Cmd.map GridMsg gridCmd
+                                      , Cmd.map StatusMsg statusCmd
+                                      ]
                                 )
+                        else
+                            ( { model | curTime = t }, Cmd.none )
 
             TimerTick _ ->
                 ( model, newNumber )
@@ -141,6 +159,13 @@ update msg model =
                         Grid.update gmsg model.grid
                 in
                     { model | grid = gridState } ! [ Cmd.map GridMsg gridCmd ]
+
+            StatusMsg smsg ->
+                let
+                    ( statusState, statusCmd ) =
+                        Status.update smsg model.status
+                in
+                    { model | status = statusState } ! [ Cmd.map StatusMsg statusCmd ]
 
 
 subscriptions : Model -> Sub Msg
@@ -159,6 +184,7 @@ subscriptions model =
         Sub.batch
             ([ resizes ScreenResize
              , Sub.map GridMsg (Grid.subscriptions model.grid)
+             , Sub.map StatusMsg (Status.subscriptions model.status)
              ]
                 ++ timers
             )

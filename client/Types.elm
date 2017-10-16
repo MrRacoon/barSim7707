@@ -3,6 +3,7 @@ module Types exposing (..)
 import Time exposing (Time)
 import Window exposing (Size)
 import Grid.Types as Grid
+import Status.Types as Status
 
 
 type State
@@ -18,6 +19,7 @@ type Msg
     | WaitTick Time
     | ScreenResize Size
     | GridMsg Grid.Msg
+    | StatusMsg Status.Msg
 
 
 type alias Model =
@@ -43,4 +45,5 @@ type alias Model =
     , screenHeight : Int
     , errors : List String
     , grid : Grid.Model
+    , status : Status.Model
     }
