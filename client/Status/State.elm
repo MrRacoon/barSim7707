@@ -5,22 +5,33 @@ import Animation
 import Color exposing (black, white, blue, red)
 
 
+y : Float
+y =
+    70
+
+
 init : ( Model, Cmd Msg )
 init =
     { isShown = False
-    , time = 0
-    , message = "Next game starts soon"
+    , message = "Next game in:"
     , g =
         Animation.style
-            [ Animation.translate (Animation.percent -100) (Animation.percent 40)
+            [ Animation.translate (Animation.percent -100) (Animation.percent y)
             ]
     , rect =
         Animation.style
             [ Animation.attr "height" 20 "%"
-            , Animation.attr "width" 100 "%"
+            , Animation.attr "width" 30 "%"
             , Animation.fill black
             ]
     , text =
+        Animation.style
+            [ Animation.y 50
+            , Animation.attr "font-size" 50 "px"
+            , Animation.exactly "font-family" "Verdana"
+            , Animation.fill white
+            ]
+    , timer =
         Animation.style
             [ Animation.y 100
             , Animation.attr "font-size" 50 "px"
@@ -40,10 +51,10 @@ update msg model =
                     | g =
                         Animation.interrupt
                             [ Animation.set
-                                [ Animation.translate (Animation.percent -100) (Animation.percent 40)
+                                [ Animation.translate (Animation.percent -100) (Animation.percent y)
                                 ]
                             , Animation.to
-                                [ Animation.translate (Animation.percent 0) (Animation.percent 40)
+                                [ Animation.translate (Animation.percent 0) (Animation.percent y)
                                 ]
                             ]
                             model.g
@@ -54,15 +65,12 @@ update msg model =
                     | g =
                         Animation.interrupt
                             [ Animation.to
-                                [ Animation.translate (Animation.percent 200) (Animation.percent 40)
+                                [ Animation.translate (Animation.percent 200) (Animation.percent y)
                                 ]
                             ]
                             model.g
                 }
                     ! []
-
-        UpdateTimer val ->
-            { model | time = val } ! []
 
         UpdateMessage str ->
             { model | message = str } ! []
@@ -76,6 +84,9 @@ update msg model =
         UpdateText amsg ->
             { model | text = Animation.update amsg model.text } ! []
 
+        UpdateTimer amsg ->
+            { model | timer = Animation.update amsg model.timer } ! []
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -83,4 +94,5 @@ subscriptions model =
         [ Animation.subscription UpdateG [ model.g ]
         , Animation.subscription UpdateRect [ model.rect ]
         , Animation.subscription UpdateText [ model.text ]
+        , Animation.subscription UpdateTimer [ model.timer ]
         ]
