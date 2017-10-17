@@ -13,6 +13,8 @@ type alias Location =
     , width : Float
     , x : Float
     , y : Float
+    , screenHeight : Int
+    , screenWidth : Int
     }
 
 
@@ -47,6 +49,8 @@ location screenHeight screenWidth num =
         , col = col
         , x = x
         , y = y
+        , screenHeight = screenHeight
+        , screenWidth = screenWidth
         }
 
 

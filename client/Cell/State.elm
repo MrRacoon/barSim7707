@@ -9,6 +9,7 @@ import Color exposing (blue, yellow)
 init : Int -> ( Model, Cmd Msg )
 init num =
     { num = num
+    , loc = location 0 0 num
     , g =
         Animation.style
             [ Animation.translate (Animation.px 0) (Animation.px 0)
@@ -44,10 +45,11 @@ update msg model =
         UpdateScreenSize height width ->
             let
                 loc =
-                    location height width model.num
+                    location height width model.loc.num
             in
                 { model
-                    | g =
+                    | loc = loc
+                    , g =
                         Animation.interrupt
                             [ Animation.to
                                 [ Animation.translate
@@ -61,7 +63,6 @@ update msg model =
                             [ Animation.set
                                 [ Animation.attr "height" loc.height ""
                                 , Animation.attr "width" loc.width ""
-                                , Animation.fill blue
                                 ]
                             ]
                             model.rect
@@ -98,7 +99,8 @@ update msg model =
 
         Reset loc ->
             { model
-                | g =
+                | loc = loc
+                , g =
                     Animation.interrupt
                         [ Animation.to
                             [ Animation.translate
@@ -132,7 +134,8 @@ update msg model =
 
         MoveTo loc ->
             { model
-                | g =
+                | loc = loc
+                , g =
                     Animation.interrupt
                         [ Animation.to
                             [ Animation.translate

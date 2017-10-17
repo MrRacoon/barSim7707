@@ -1,12 +1,12 @@
 module Cell.Types exposing (..)
 
 import Animation
-import Color exposing (Color)
 import Utils exposing (Location)
 
 
 type alias Model =
     { num : Int
+    , loc : Location
     , g : Animation.State
     , rect : Animation.State
     , text : Animation.State
