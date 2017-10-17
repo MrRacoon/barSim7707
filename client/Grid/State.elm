@@ -49,7 +49,7 @@ update msg model =
                         |> List.map
                             (\( i, c ) ->
                                 ( i
-                                , Cell.update (CellTypes.MoveTo <| location model.height model.width i) c
+                                , Cell.update (CellTypes.Reset <| location model.height model.width i) c
                                 )
                             )
 

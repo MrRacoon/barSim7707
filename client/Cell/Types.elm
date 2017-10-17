@@ -21,6 +21,6 @@ type Msg
     | UpdateScreenSize Int Int
     | UpdateColor Color
     | Picked
-    | Reset
+    | Reset Location
     | MoveTo Location
     | Hide

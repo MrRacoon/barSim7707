@@ -121,9 +121,19 @@ update msg model =
             }
                 ! []
 
-        Reset ->
+        Reset loc ->
             { model
-                | rect =
+                | g =
+                    Animation.interrupt
+                        [ Animation.to
+                            [ Animation.translate
+                                (Animation.px loc.x)
+                                (Animation.px loc.y)
+                            , Animation.opacity 1
+                            ]
+                        ]
+                        model.g
+                , rect =
                     Animation.interrupt
                         [ Animation.to
                             [ Animation.fill blue
@@ -157,12 +167,6 @@ update msg model =
                             ]
                         ]
                         model.g
-                , rect =
-                    Animation.interrupt
-                        [ Animation.to
-                            [ Animation.fill blue ]
-                        ]
-                        model.rect
             }
                 ! []
 

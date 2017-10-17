@@ -10,12 +10,12 @@ pickCount =
 
 waitTime : Time
 waitTime =
-    30 * second
+    5 * second
 
 
 tickTime : Time
 tickTime =
-    3 * second
+    1 * second
 
 
 padding : Float

@@ -93,7 +93,7 @@ update msg model =
                             Status.update (StatusTypes.Show True) model.status
 
                         ( gridState, gridCmd ) =
-                            Grid.update (GridTypes.Summary model.picked) model.grid
+                            Grid.update (GridTypes.Summary <| List.reverse model.picked) model.grid
                     in
                         ({ model
                             | state = PreGame
