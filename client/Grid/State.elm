@@ -5,9 +5,10 @@ import Cell.Types as CellTypes
 import Grid.Types exposing (Model, Msg(..))
 import Dict
 import Animation
+import Ease
 import Utils exposing (location)
 import Color exposing (black, blue, red, yellow)
-import Constants exposing (rows, cols)
+import Constants exposing (rows, cols, tickTime)
 import List.Extra as ListE
 
 
@@ -31,6 +32,8 @@ init =
                 , Animation.cx -10
                 , Animation.cy -10
                 , Animation.radius 10
+                , Animation.offset 0.75
+                , Animation.stopColor black
                 ]
         , height = 300
         , width = 300
@@ -120,11 +123,11 @@ update msg model =
                                         , Animation.opacity 1
                                         , Animation.fill red
                                         ]
-                                    , Animation.to
+                                    , Animation.toWith (Animation.easing { duration = tickTime / 2, ease = Ease.inQuad })
                                         [ Animation.cx (loc.x + (loc.width / 2))
                                         , Animation.cy (loc.y + (loc.height / 2))
                                         , Animation.radius 50
-                                        , Animation.opacity 0.8
+                                        , Animation.opacity 1
                                         , Animation.fill yellow
                                         ]
                                     , Animation.to

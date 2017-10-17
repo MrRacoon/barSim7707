@@ -15,7 +15,7 @@ waitTime =
 
 tickTime : Time
 tickTime =
-    1 * second
+    3 * second
 
 
 padding : Float

@@ -17,9 +17,7 @@ type Msg
     = UpdateG Animation.Msg
     | UpdateRect Animation.Msg
     | UpdateText Animation.Msg
-    | UpdatePosition Float Float
     | UpdateScreenSize Int Int
-    | UpdateColor Color
     | Picked
     | Reset Location
     | MoveTo Location

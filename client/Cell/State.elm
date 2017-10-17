@@ -83,31 +83,6 @@ update msg model =
                 }
                     ! []
 
-        UpdatePosition x y ->
-            { model
-                | g =
-                    Animation.interrupt
-                        [ Animation.to
-                            [ Animation.x x
-                            , Animation.y y
-                            ]
-                        ]
-                        model.g
-            }
-                ! []
-
-        UpdateColor c ->
-            { model
-                | rect =
-                    Animation.interrupt
-                        [ Animation.to
-                            [ Animation.fill c
-                            ]
-                        ]
-                        model.rect
-            }
-                ! []
-
         Picked ->
             { model
                 | rect =
