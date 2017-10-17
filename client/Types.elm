@@ -4,6 +4,7 @@ import Time exposing (Time)
 import Window exposing (Size)
 import Grid.Types as Grid
 import Status.Types as Status
+import Stats.Types as Stats
 
 
 type State
@@ -20,6 +21,7 @@ type Msg
     | ScreenResize Size
     | GridMsg Grid.Msg
     | StatusMsg Status.Msg
+    | StatsMsg Stats.Msg
 
 
 type alias Model =
@@ -46,4 +48,5 @@ type alias Model =
     , errors : List String
     , grid : Grid.Model
     , status : Status.Model
+    , stats : Stats.Model
     }

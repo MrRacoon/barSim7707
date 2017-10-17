@@ -5,6 +5,7 @@ import Html exposing (Html, div)
 import Constants exposing (waitTime)
 import Grid.View as Grid
 import Status.View as Status
+import Stats.View as Stats
 import Svg exposing (Svg, svg, rect)
 import Svg.Attributes exposing (height, width, fill)
 import Date exposing (fromTime, minute, second)
@@ -40,4 +41,5 @@ view model =
                 []
             , Svg.map GridMsg (Grid.view model.grid)
             , Status.view model.status mins secs
+            , Stats.view model.stats
             ]

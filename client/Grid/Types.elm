@@ -3,7 +3,6 @@ module Grid.Types exposing (..)
 import Animation
 import Dict
 import Cell.Types as Cell
-import Utils exposing (Location)
 
 
 type alias Model =

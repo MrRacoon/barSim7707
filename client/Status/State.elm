@@ -65,7 +65,7 @@ update msg model =
                     | g =
                         Animation.interrupt
                             [ Animation.to
-                                [ Animation.translate (Animation.percent 200) (Animation.percent y)
+                                [ Animation.translate (Animation.percent -100) (Animation.percent y)
                                 ]
                             ]
                             model.g

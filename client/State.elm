@@ -10,6 +10,8 @@ import Grid.State as Grid
 import Grid.Types as GridTypes
 import Status.State as Status
 import Status.Types as StatusTypes
+import Stats.State as Stats
+import Stats.Types as StatsTypes
 
 
 init : ( Model, Cmd Msg )
@@ -20,6 +22,9 @@ init =
 
         ( statusState, statusCmd ) =
             Status.init
+
+        ( statsState, statsCmd ) =
+            Stats.init
     in
         ({ avail = List.range 1 (cols * rows)
          , picked = []
@@ -32,10 +37,12 @@ init =
          , errors = []
          , grid = gridState
          , status = statusState
+         , stats = statsState
          }
             ! [ perform ScreenResize size
               , Cmd.map GridMsg gridCmd
               , Cmd.map StatusMsg statusCmd
+              , Cmd.map StatsMsg statsCmd
               ]
         )
 
@@ -92,6 +99,9 @@ update msg model =
                         ( statusState, statusCmd ) =
                             Status.update (StatusTypes.Show True) model.status
 
+                        ( statsState, statsCmd ) =
+                            Stats.update (StatsTypes.Show model.picked) model.stats
+
                         ( gridState, gridCmd ) =
                             Grid.update (GridTypes.Summary <| List.reverse model.picked) model.grid
                     in
@@ -100,10 +110,12 @@ update msg model =
                             , lastDrawn = Nothing
                             , startTime = Nothing
                             , status = statusState
+                            , stats = statsState
                             , grid = gridState
                          }
                             ! [ Cmd.map StatusMsg statusCmd
                               , Cmd.map GridMsg gridCmd
+                              , Cmd.map StatsMsg statsCmd
                               ]
                         )
                 else if List.member x model.picked then
@@ -139,6 +151,9 @@ update msg model =
 
                                 ( statusState, statusCmd ) =
                                     Status.update (StatusTypes.Show False) model.status
+
+                                ( statsState, statsCmd ) =
+                                    Stats.update StatsTypes.Hide model.stats
                             in
                                 ({ model
                                     | startTime = Nothing
@@ -148,9 +163,11 @@ update msg model =
                                     , curTime = t
                                     , grid = gridState
                                     , status = statusState
+                                    , stats = statsState
                                  }
                                     ! [ Cmd.map GridMsg gridCmd
                                       , Cmd.map StatusMsg statusCmd
+                                      , Cmd.map StatsMsg statsCmd
                                       ]
                                 )
                         else
@@ -173,6 +190,13 @@ update msg model =
                 in
                     { model | status = statusState } ! [ Cmd.map StatusMsg statusCmd ]
 
+            StatsMsg smsg ->
+                let
+                    ( statsState, statsCmd ) =
+                        Stats.update smsg model.stats
+                in
+                    { model | stats = statsState } ! [ Cmd.map StatsMsg statsCmd ]
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -191,6 +215,7 @@ subscriptions model =
             ([ resizes ScreenResize
              , Sub.map GridMsg (Grid.subscriptions model.grid)
              , Sub.map StatusMsg (Status.subscriptions model.status)
+             , Sub.map StatsMsg (Stats.subscriptions model.stats)
              ]
                 ++ timers
             )
