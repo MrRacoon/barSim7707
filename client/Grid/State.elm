@@ -111,24 +111,36 @@ update msg model =
                     let
                         loc =
                             location model.height model.width index
+
+                        interpx =
+                            Animation.easing { duration = tickTime / 2, ease = Ease.inExpo }
+
+                        interpy =
+                            Animation.easing { duration = tickTime / 2, ease = Ease.inQuad }
+
+                        interpr =
+                            Animation.easing { duration = tickTime / 2, ease = Ease.inExpo }
+
+                        interp =
+                            Animation.easing { duration = tickTime / 2, ease = Ease.linear }
                     in
                         { model
                             | cells = Dict.insert index cellState model.cells
                             , ball =
                                 Animation.interrupt
                                     [ Animation.set
-                                        [ Animation.cx (toFloat model.width / 2)
-                                        , Animation.cy -1000
-                                        , Animation.radius 1000
+                                        [ Animation.cx (toFloat loc.screenWidth / 2)
+                                        , Animation.cy -200
+                                        , Animation.radius 200
                                         , Animation.opacity 1
                                         , Animation.fill red
                                         ]
-                                    , Animation.toWith (Animation.easing { duration = tickTime / 2, ease = Ease.inQuad })
-                                        [ Animation.cx (loc.x + (loc.width / 2))
-                                        , Animation.cy (loc.y + (loc.height / 2))
-                                        , Animation.radius 50
-                                        , Animation.opacity 1
-                                        , Animation.fill yellow
+                                    , Animation.toWithEach
+                                        [ ( interpx, Animation.cx (loc.x + (loc.width / 2)) )
+                                        , ( interpy, Animation.cy (loc.y + (loc.height / 2)) )
+                                        , ( interpr, Animation.radius 50 )
+                                        , ( interp, Animation.opacity 1 )
+                                        , ( interp, Animation.fill yellow )
                                         ]
                                     , Animation.to
                                         [ Animation.opacity 0
