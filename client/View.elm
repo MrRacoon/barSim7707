@@ -2,6 +2,7 @@ module View exposing (..)
 
 import Types exposing (Model, Msg(..))
 import Html exposing (Html, div)
+import Svg.Lazy exposing (lazy, lazy3)
 import Constants exposing (waitTime)
 import Grid.View as Grid
 import Status.View as Status
@@ -39,7 +40,7 @@ view model =
                 , fill "grey"
                 ]
                 []
-            , Svg.map GridMsg (Grid.view model.grid)
-            , Status.view model.status mins secs
-            , Stats.view model.stats
+            , Svg.map GridMsg (lazy Grid.view model.grid)
+            , Svg.map StatusMsg <| lazy3 Status.view model.status mins secs
+            , Svg.map StatsMsg <| lazy Stats.view model.stats
             ]
