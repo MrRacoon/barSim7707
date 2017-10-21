@@ -4,7 +4,7 @@ DIST_FILE = ${DIST_DIR}/index.js
 INDEX_FILE = ${DIST_DIR}/index.html
 
 
-full: clean build open
+full: clean build pkg
 
 build: ${DIST_DIR} ${DIST_FILE} ${INDEX_FILE}
 
@@ -25,3 +25,6 @@ clean:
 
 open:
 	xdg-open ${INDEX_FILE}
+
+pkg: build
+	tar -cvzf barsim.tar.gz ./dist/*
