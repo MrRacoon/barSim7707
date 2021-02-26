@@ -7,8 +7,16 @@
     <script src="./index.js" charset="utf-8"></script>
   </head>
   <body>
+    <style media="screen">
+      body {
+        overflow: hidden;
+        background-color: grey;
+      }
+    </style>
+    <span id="app"></span>
     <script type="text/javascript">
-      Elm.Main.fullscreen();
+      const elem = document.getElementById('app');
+      const app = Elm.Main.embed(elem);
     </script>
   </body>
 </html>
